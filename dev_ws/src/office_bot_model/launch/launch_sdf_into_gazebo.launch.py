@@ -79,12 +79,17 @@ def generate_launch_description():
     )
 
     # Load controllers
-    load_joint_trajectory_controller = ExecuteProcess(
+    load_drawers_controller = ExecuteProcess(
             cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
                 'joint_group_position_controller'],
             output='screen'
         )
-   
+       # Load controllers
+    load_wheels_controller = ExecuteProcess(
+            cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+                'mecanum_drive_controller'],
+            output='screen'
+        )
     # Add RViz to the launch description
     rviz_config_path = PathJoinSubstitution(
         [
@@ -107,6 +112,7 @@ def generate_launch_description():
         spawn_robot,
         ignition_launch,
         joint_state_broadcaster_spawner,
-        load_joint_trajectory_controller,
-        # rviz_node  # Add RViz node here
+        load_drawers_controller,
+        load_wheels_controller,
+        rviz_node  # Add RViz node here
     ])
