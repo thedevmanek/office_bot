@@ -66,6 +66,9 @@ def generate_launch_description():
         arguments=[
             "-name", "office_bot",  # Name of the robot
             "-file", robot_description_path,  # Use the SDF file directly
+            "-x", "0",  # X position
+            "-y", "0",  # Y position
+            "-z", "0.2" # Z position
         ],
         output="screen"
     )
@@ -96,6 +99,7 @@ def generate_launch_description():
             FindPackageShare("office_bot_model"),
             "config",
             "robot_config.rviz",  # Adjust this path to your specific RViz configuration file
+
         ]
     )
 
@@ -114,5 +118,5 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         load_drawers_controller,
         load_wheels_controller,
-        rviz_node  # Add RViz node here
+        # rviz_node  # Add RViz node here
     ])

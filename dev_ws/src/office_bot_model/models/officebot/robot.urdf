@@ -1,471 +1,417 @@
-<robot name="onshape">
+<robot name="officebot">
     <link name="dummy_root_link">
         <!-- No inertial element here -->
     </link>
 
     <joint name="dummy_root" type="fixed">
         <parent link="dummy_root_link" />
-        <child link="body" />
+        <child link="base" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
 
-    <link name="body">
+    <link name="base">
         <visual>
-            <origin xyz="0.11139852961262168562 0.089000000000000384359 0.38410790812923634174"
-                rpy="-3.858025010572418978e-15 -1.2577780768538566594e-29 -8.2998400309755128718e-16" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/body.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/base.stl" />
             </geometry>
-            <material name="body_material">
+            <material name="base_material">
                 <color
                     rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0" />
             </material>
         </visual>
         <collision>
-            <origin xyz="0.11139852961262168562 0.089000000000000384359 0.38410790812923634174"
-                rpy="-3.858025010572418978e-15 -1.2577780768538566594e-29 -8.2998400309755128718e-16" />
+            <origin xyz="0 0 0" rpy="0 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/body.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/base.stl" />
             </geometry>
         </collision>
         <inertial>
-            <origin xyz="0.1113985296126214497 0.084946262995955451602 0.98170625619958717945"
+            <origin xyz="-1.1402394615806152526e-05 0.0058167257603785474732 0.20057979617316373799"
                 rpy="0 0 0" />
-            <mass value="121.42399779769446866" />
-            <inertia ixx="25.243209922238200704" ixy="1.2323183333086835792e-15"
-                ixz="4.8939197670346076597e-15" iyy="26.369944073256100125"
-                iyz="0.025532058190526257802" izz="4.7605671878682462861" />
+            <mass value="15.348841199999997187" />
+            <inertia ixx="0.73742104771351546511" ixy="-1.8930735126360120308e-06"
+                ixz="3.8401508000569941443e-05" iyy="0.63465684290949331281"
+                iyz="-0.019589836025708705358" izz="0.35481063170305271459" />
         </inertial>
     </link>
 
-    <link name="drawer_1">
+    <link name="drawer1">
         <visual>
-            <origin xyz="-4.1633363423443370266e-17 1.0503975265017666541 -0.20099999999999995648"
-                rpy="1.570796326794896558 8.9808275756771226179e-74 0" />
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
+                rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_1.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
-            <material name="drawer_1_material">
+            <material name="drawer_material">
                 <color
                     rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
             </material>
         </visual>
         <collision>
-            <origin xyz="-4.1633363423443370266e-17 1.0503975265017666541 -0.20099999999999995648"
-                rpy="1.570796326794896558 8.9808275756771226179e-74 0" />
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
+                rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_1.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
         </collision>
         <inertial>
-            <origin xyz="1.8786493135960251914e-15 0.021188400757921277417 -0.19193981924916772575"
+            <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="12.15096412314713703" />
-            <inertia ixx="0.21971974235644850526" ixy="8.4393595751380919362e-78"
-                ixz="-1.2033413589892864085e-16" iyy="0.47874007371440691072"
-                iyz="-0.00029049447768296656055" izz="0.28122825510383930858" />
+            <mass value="1.3157567401165588539" />
+            <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
+                ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
+                iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
         </inertial>
     </link>
 
-    <joint name="body_drawer1" type="prismatic">
-        <origin xyz="0.11139852961262201869 0.28900000000000447553 1.4341079081292327224"
-            rpy="-1.5707963267949005548 -2.2826695857946046115e-59 -2.8833301735078483983e-45" />
-        <parent link="body" />
-        <child link="drawer_1" />
+    <joint name="base_drawer1" type="prismatic">
+        <origin xyz="0.11500980138576723244 -0.20500000000000001554 0.56999968326568606347"
+            rpy="-1.570796326794896558 -0 3.141592653589793116" />
+        <parent link="base" />
+        <child link="drawer1" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="0.35" />
-
+        <dynamics damping="0.1" friction="0.0" />
+        <limit effort="10" velocity="10" lower="0" upper="0.4" />
 
     </joint>
 
     <link name="drawer_2">
         <visual>
-            <origin xyz="-4.1633363423443370266e-17 0.91039752650176686277 -0.22"
+            <origin xyz="0.015004444442000025584 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_2.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
-            <material name="drawer_2_material">
+            <material name="drawer_material">
                 <color
                     rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
             </material>
         </visual>
         <collision>
-            <origin xyz="-4.1633363423443370266e-17 0.91039752650176686277 -0.20099999999999995648"
+            <origin xyz="0.015004444442000025584 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_2.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
         </collision>
         <inertial>
-            <origin xyz="1.8725205754007119547e-15 0.021188400757921718037 -0.19193981924916772575"
+            <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="12.15096412314713703" />
-            <inertia ixx="0.21971974235644850526" ixy="0" ixz="-1.2022691244723592603e-16"
-                iyy="0.47874007371440685521" iyz="-0.00029049447768295739904"
-                izz="0.2812282551038394196" />
+            <mass value="1.3157567401165588539" />
+            <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
+                ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
+                iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
         </inertial>
     </link>
 
-    <joint name="body_drawer2" type="prismatic">
-        <origin xyz="0.11139852961262233788 0.30900000000000393818 1.2941079081292357067"
-            rpy="-1.5707963267949005548 -0 0" />
-        <parent link="body" />
+    <joint name="base_drawer2" type="prismatic">
+        <origin xyz="0.11500980138576727407 -0.20500000000000001554 0.46999968326568986043"
+            rpy="-1.570796326794896558 -0 3.141592653589793116" />
+        <parent link="base" />
         <child link="drawer_2" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="0.35" />
+        <limit effort="10" velocity="10" lower="0" upper="0.4" />
 
     </joint>
 
     <link name="drawer_3">
         <visual>
-            <origin xyz="-2.7755575615628913511e-17 0.77000000000000012879 -0.22"
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_3.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
-            <material name="drawer_3_material">
+            <material name="drawer_material">
                 <color
                     rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
             </material>
         </visual>
         <collision>
-            <origin xyz="-2.7755575615628913511e-17 0.77000000000000012879 -0.20099999999999995648"
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_3.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
         </collision>
         <inertial>
-            <origin xyz="1.8699838653961033913e-15 0.020790874256154778799 -0.1919398192491677535"
+            <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="12.150964123147144136" />
-            <inertia ixx="0.21971974235644853302" ixy="0" ixz="-1.1994569005162322386e-16"
-                iyy="0.47874007371440691072" iyz="-0.00029049447768296103112"
-                izz="0.28122825510383947512" />
+            <mass value="1.3157567401165588539" />
+            <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
+                ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
+                iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
         </inertial>
     </link>
 
-    <joint name="body_drawer3" type="prismatic">
-        <origin xyz="0.11139852961262233788 0.30900000000000343858 1.1541079081292353603"
-            rpy="-1.5707963267949005548 -0 0" />
-        <parent link="body" />
+    <joint name="base_drawer3" type="prismatic">
+        <origin xyz="0.11500980138576721856 -0.20500000000000001554 0.36999968326568610788"
+            rpy="-1.570796326794896558 -0 3.141592653589793116" />
+        <parent link="base" />
         <child link="drawer_3" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="0.35" />
+        <limit effort="10" velocity="10" lower="0" upper="0.4" />
 
     </joint>
 
     <link name="drawer_4">
         <visual>
-            <origin xyz="-4.1633363423443370266e-17 0.6303975265017667251 -0.22"
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
-            <material name="drawer_4_material">
+            <material name="drawer_material">
                 <color
                     rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
             </material>
         </visual>
         <collision>
-            <origin xyz="-4.1633363423443370266e-17 0.6303975265017667251 -0.20099999999999990097"
+            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
                 rpy="1.570796326794896558 -0 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
         </collision>
         <inertial>
-            <origin xyz="1.8731087460528524279e-15 0.021188400757921391909 -0.19193981924916769799"
+            <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="12.150964123147142359" />
-            <inertia ixx="0.21971974235644850526" ixy="0" ixz="-1.2023720260574807953e-16"
-                iyy="0.47874007371440674419" iyz="-0.00029049447768296222374"
-                izz="0.28122825510383936409" />
+            <mass value="1.3157567401165588539" />
+            <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
+                ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
+                iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
         </inertial>
     </link>
 
-    <joint name="body_drawer4" type="prismatic">
-        <origin xyz="0.11139852961262233788 0.30900000000000293898 1.014107908129235458"
-            rpy="-1.5707963267949005548 -0 0" />
-        <parent link="body" />
+    <!-- <disable_collisions link1="drawer_1" link2="drawer_2" reason="Adjacent" />
+    <disable_collisions link1="drawer_2" link2="drawer_3" reason="Adjacent" />
+    <disable_collisions link1="drawer_3" link2="drawer_4" reason="Adjacent" /> -->
+
+
+    <joint name="base_drawer4" type="prismatic">
+        <origin xyz="0.11500980138576723244 -0.20500000000000001554 0.26999968326568613008"
+            rpy="-1.570796326794896558 -0 3.141592653589793116" />
+        <parent link="base" />
         <child link="drawer_4" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="0.35" />
+        <limit effort="10" velocity="10" lower="0" upper="0.4" />
 
     </joint>
 
-    <link name="drawer_5">
-        <visual>
-            <origin xyz="-2.7755575615628913511e-17 0.49000000000000021316 -0.22"
-                rpy="1.570796326794896558 -0 0" />
-            <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_5.stl" />
-            </geometry>
-            <material name="drawer_5_material">
-                <color
-                    rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="-2.7755575615628913511e-17 0.49000000000000021316 -0.20099999999999995648"
-                rpy="1.570796326794896558 -0 0" />
-            <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/drawer_5.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <origin xyz="1.8804885932433489274e-15 0.020790874256154886351 -0.1919398192491677535"
-                rpy="0 0 0" />
-            <mass value="12.150964123147142359" />
-            <inertia ixx="0.21971974235644858853" ixy="0" ixz="-1.2012168933904195386e-16"
-                iyy="0.47874007371440691072" iyz="-0.00029049447768295636905"
-                izz="0.2812282551038394196" />
-        </inertial>
-    </link>
-
-    <joint name="body_drawer5" type="prismatic">
-        <origin xyz="0.11139852961262233788 0.30900000000000238387 0.87410790812923566673"
-            rpy="-1.5707963267949005548 -0 0" />
-        <parent link="body" />
-        <child link="drawer_5" />
-        <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="0.35" />
-
-    </joint>
-
-    <link name="top">
-        <visual>
-            <origin xyz="0.034079078584909439087 0 0.00038622319698333740234"
-                rpy="-1.570796326794896558 -1.570796326794896558 0" />
-            <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/top.stl" />
-            </geometry>
-            <material name="top_material">
-                <color
-                    rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0" />
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="0.034079078584909439087 0 0.00038622319698333740234"
-                rpy="-1.570796326794896558 -1.570796326794896558 0" />
-            <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/top.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <origin xyz="0.20006196387112140656 0.012500000000000004163 8.6194072712597617911e-18"
-                rpy="0 0 0" />
-            <mass value="3.5021688823303080973" />
-            <inertia ixx="0.073189465450971866178" ixy="0" ixz="0" iyy="0.11973158479380799357"
-                iyz="0" izz="0.046906928601412191393" />
-        </inertial>
-    </link>
-
-    <joint name="body_top" type="revolute">
-        <origin xyz="0.11139852961262151909 -0.11099999999999385358 1.8841079081292368969"
-            rpy="1.570796326794896558 -0 1.570796326794896558" />
-        <parent link="body" />
-        <child link="top" />
-        <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0" upper="1.570796326794896558" />
-
-    </joint>
-
-    <link name="wheel_4">
+    <link name="wheel_tr">
         <visual>
             <origin
-                xyz="-1.2068124277675451594e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
+                xyz="-1.2068141624910211362e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
-            <material name="wheel_4_material">
+            <material name="wheel_material">
                 <color
                     rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
             </material>
         </visual>
         <collision>
             <origin
-                xyz="-1.2068124277675451594e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
+                xyz="-1.2068141624910211362e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
         </collision>
         <inertial>
             <origin
-                xyz="-0.00012384960631775803093 1.7288366529739083642e-08 -0.014664740164935673519"
+                xyz="-0.00012384960631777524264 1.7288366529908357882e-08 -0.014664740164935676989"
                 rpy="0 0 0" />
-            <mass value="0.021505374555847413948" />
-            <inertia ixx="4.5670776315593599449e-06" ixy="4.6693190005773643614e-12"
-                ixz="-2.8901187565512058882e-09" iyy="4.6149952980252326439e-06"
-                iyz="-3.7205436020749622657e-09" izz="6.8500077196540722806e-06" />
+            <mass value="0.021505374555847410478" />
+            <inertia ixx="4.5670776315593607919e-06" ixy="4.6693190007475188061e-12"
+                ixz="-2.8901187565512819888e-09" iyy="4.6149952980252317969e-06"
+                iyz="-3.7205436020749213202e-09" izz="6.8500077196540731277e-06" />
         </inertial>
     </link>
 
-    <joint name="body_wheel1" type="revolute">
-        <origin xyz="0.29639852961262153075 -0.080999999999999780509 0.38410790812923700788"
-            rpy="1.5707963267949005548 1.2200043742502535832e-29 3.1415926535897922278" />
-        <parent link="body" />
-        <child link="wheel_4" />
+    <joint name="base_wheel_tr" type="revolute">
+        <origin xyz="-0.14000000000000001332 -0.18080000000000001625 -0.025000000000000011796"
+            rpy="6.7696525891777836328e-17 1.570796326794896558 0" />
+        <parent link="base" />
+        <child link="wheel_tr" />
         <axis xyz="0 0 1" />
         <limit effort="10" velocity="20" />
 
     </joint>
 
-    <link name="wheel_4_2">
+    <link name="wheel_br">
         <visual>
             <origin
-                xyz="-1.2068138155463259409e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
+                xyz="-9.995476668578362478e-15 -1.7179980940640326992e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
-            <material name="wheel_4_material">
+            <material name="wheel_material">
                 <color
                     rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
             </material>
         </visual>
         <collision>
             <origin
-                xyz="-1.2068138155463259409e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
+                xyz="-9.995476668578362478e-15 -1.7179980940640326992e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
         </collision>
         <inertial>
             <origin
-                xyz="-0.00012384960631777190872 1.7288366529739083642e-08 -0.014664740164935673519"
+                xyz="-0.0001238495942596290944 1.728234698393556713e-08 -0.014664740164935676989"
                 rpy="0 0 0" />
-            <mass value="0.021505374555847413948" />
-            <inertia ixx="4.5670776315593599449e-06" ixy="4.6693190005773643614e-12"
-                ixz="-2.8901187565512058882e-09" iyy="4.6149952980252326439e-06"
-                iyz="-3.7205436020749622657e-09" izz="6.8500077196540722806e-06" />
+            <mass value="0.021505374555847410478" />
+            <inertia ixx="4.5670776315593607919e-06" ixy="4.6693190007475188061e-12"
+                ixz="-2.8901187565512819888e-09" iyy="4.6149952980252317969e-06"
+                iyz="-3.7205436020749213202e-09" izz="6.8500077196540731277e-06" />
         </inertial>
     </link>
 
-    <joint name="body_wheel3" type="revolute">
-        <origin xyz="-0.073601470387378437055 -0.080999999999999447442 0.38410790812923700788"
-            rpy="1.5707963267949005548 1.2200043742502535832e-29 3.1415926535897922278" />
-        <parent link="body" />
-        <child link="wheel_4_2" />
+    <joint name="base_wheel_br" type="revolute">
+        <origin xyz="-0.14000000000000001332 0.18080000000000001625 -0.025000000000000018735"
+            rpy="3.141592653589793116 -1.570796326794896558 0" />
+        <parent link="base" />
+        <child link="wheel_br" />
         <axis xyz="0 0 1" />
         <limit effort="10" velocity="20" />
 
     </joint>
 
-    <link name="wheel_4_3">
+    <link name="wheel_tl">
         <visual>
             <origin
-                xyz="-9.9920072216264088638e-15 -1.717998093786476943e-07 -0.015750853796563712983"
+                xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
-            <material name="wheel_4_material">
+            <material name="wheel_material">
                 <color
                     rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
             </material>
         </visual>
         <collision>
             <origin
-                xyz="-9.9920072216264088638e-15 -1.717998093786476943e-07 -0.015750853796563712983"
+                xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
         </collision>
         <inertial>
             <origin
-                xyz="-0.00012384959425962576048 1.7282347011521868505e-08 -0.014664740164935704744"
+                xyz="-0.00012384960631778565098 1.7288366540316698738e-08 -0.014664740164935676989"
                 rpy="0 0 0" />
-            <mass value="0.021505374555847413948" />
-            <inertia ixx="4.5670776315593599449e-06" ixy="4.6693190005773643614e-12"
-                ixz="-2.8901187565512058882e-09" iyy="4.6149952980252326439e-06"
-                iyz="-3.7205436020749622657e-09" izz="6.8500077196540722806e-06" />
+            <mass value="0.021505374555847410478" />
+            <inertia ixx="4.5670776315593607919e-06" ixy="4.6693190007475188061e-12"
+                ixz="-2.8901187565512819888e-09" iyy="4.6149952980252317969e-06"
+                iyz="-3.7205436020749213202e-09" izz="6.8500077196540731277e-06" />
         </inertial>
     </link>
 
-    <joint name="body_wheel4" type="revolute">
-        <origin xyz="0.2963985296126218083 0.25900000000000023004 0.38410790812923567561"
-            rpy="-1.5707963267948927832 1.2577780768538566594e-29 3.1415926535897922278" />
-        <parent link="body" />
-        <child link="wheel_4_3" />
+    <joint name="base_wheel_tl" type="revolute">
+        <origin xyz="0.14000000000000001332 -0.18080000000000001625 -0.025000000000000001388"
+            rpy="-1.570796326794896558 -0 1.570796326794896558" />
+        <parent link="base" />
+        <child link="wheel_tl" />
         <axis xyz="0 0 1" />
         <limit effort="10" velocity="20" />
 
     </joint>
 
-    <link name="wheel_4_4">
+    <link name="wheel_bl">
         <visual>
             <origin
-                xyz="-1.2068138155463259409e-11 -1.7179378986043047917e-07 -0.015750853796563712983"
+                xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
-            <material name="wheel_4_material">
+            <material name="wheel_material">
                 <color
                     rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
             </material>
         </visual>
         <collision>
             <origin
-                xyz="-1.2068138155463259409e-11 -1.7179378986043047917e-07 -0.015750853796563712983"
+                xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
                 rpy="1.570796326794896558 1.570796326794896558 0" />
             <geometry>
-                <mesh
-                    filename="file:///opt/officebot/models/officebot/wheel_4.stl" />
+                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
         </collision>
         <inertial>
             <origin
-                xyz="-0.00012384960631777190872 1.7288366529739083642e-08 -0.014664740164935704744"
+                xyz="-0.00012384960631778565098 1.7288366540316698738e-08 -0.014664740164935676989"
                 rpy="0 0 0" />
-            <mass value="0.021505374555847413948" />
-            <inertia ixx="4.5670776315593599449e-06" ixy="4.6693190005773643614e-12"
-                ixz="-2.8901187565512058882e-09" iyy="4.6149952980252326439e-06"
-                iyz="-3.7205436020749622657e-09" izz="6.8500077196540722806e-06" />
+            <mass value="0.021505374555847410478" />
+            <inertia ixx="4.5670776315593607919e-06" ixy="4.6693190007475188061e-12"
+                ixz="-2.8901187565512819888e-09" iyy="4.6149952980252317969e-06"
+                iyz="-3.7205436020749213202e-09" izz="6.8500077196540731277e-06" />
         </inertial>
     </link>
 
-    <joint name="body_wheel2" type="revolute">
-        <origin xyz="-0.073601470387378173377 0.25900000000000056311 0.38410790812923567561"
-            rpy="-1.5707963267948927832 1.2577780768538566594e-29 3.1415926535897922278" />
-        <parent link="body" />
-        <child link="wheel_4_4" />
+    <joint name="base_wheel_bl" type="revolute">
+        <origin xyz="0.13999999999999998557 0.1807999999999999885 -0.025000000000000001388"
+            rpy="-1.570796326794896558 -0 1.570796326794896558" />
+        <parent link="base" />
+        <child link="wheel_bl" />
         <axis xyz="0 0 1" />
         <limit effort="10" velocity="20" />
+
+    </joint>
+
+
+    <link name="lidar">
+        <visual>
+            <origin xyz="-0.007700000000000000247 0.01465999999999999942 -0.0065699999999999647571"
+                rpy="3.141592653589793116 -0 0" />
+            <geometry>
+                <mesh filename="file:///opt/officebot/models/officebot/lidar.stl" />
+            </geometry>
+            <material name="lidar_material">
+                <color
+                    rgba="0.76862745098039220171 0.88627450980392152857 0.95294117647058818044 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.007700000000000000247 0.01465999999999999942 -0.0065699999999999647571"
+                rpy="3.141592653589793116 -0 0" />
+            <geometry>
+                <mesh filename="file:///opt/officebot/models/officebot/lidar.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <origin
+                xyz="6.6596549691493207856e-05 6.0018681667141360325e-07 -0.032221019539936224252"
+                rpy="0 0 0" />
+            <mass value="0.14361062151864467662" />
+            <inertia ixx="7.6607929596010350621e-05" ixy="1.8546681181259822735e-11"
+                ixz="4.5008896873842006066e-08" iyy="9.446536275404850407e-05"
+                iyz="5.602593813075866145e-09" izz="8.7705899184357954826e-05" />
+        </inertial>
+    </link>
+
+    <joint name="base_lidar" type="revolute">
+        <origin xyz="1.561251128379126385e-17 -6.9388939039072283776e-18 0.64000000000000001332"
+            rpy="3.141592653589793116 -0 0" />
+        <parent link="base" />
+        <child link="lidar" />
+        <axis xyz="0 0 1" />
+        <limit effort="10" velocity="20" lower="0.0" upper="0.35" />
 
     </joint>
     <ros2_control name="IgnitionSystem" type="system">
         <hardware>
             <plugin>ign_ros2_control/IgnitionSystem</plugin>
         </hardware>
-        <joint name="body_top">
+
+        <joint name="base_drawer1">
             <command_interface name="position">
                 <param name="min">0</param>
                 <param name="max">1</param>
@@ -474,18 +420,9 @@
                 <param name="initial_value">0</param>
             </state_interface>
             <state_interface name="velocity" />
+
         </joint>
-        <joint name="body_drawer1">
-            <command_interface name="position">
-                <param name="min">0</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position">
-                <param name="initial_value">0</param>
-            </state_interface>
-            <state_interface name="velocity" />
-        </joint>
-        <joint name="body_drawer2">
+        <joint name="base_drawer2">
             <command_interface name="position">
                 <param name="min">0</param>
                 <param name="max">1</param>
@@ -496,7 +433,7 @@
             </state_interface>
             <state_interface name="velocity" />
         </joint>
-        <joint name="body_drawer3">
+        <joint name="base_drawer3">
             <command_interface name="position">
                 <param name="min">0</param>
                 <param name="max">1</param>
@@ -507,7 +444,7 @@
             </state_interface>
             <state_interface name="velocity" />
         </joint>
-        <joint name="body_drawer4">
+        <joint name="base_drawer4">
             <command_interface name="position">
                 <param name="min">0</param>
                 <param name="max">1</param>
@@ -519,32 +456,23 @@
             <state_interface
                 name="velocity" />
         </joint>
-        <joint name="body_drawer5">
-            <command_interface name="position">
-                <param name="min">0</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position">
-                <param name="initial_value">0</param>
-            </state_interface>
-            <state_interface name="velocity" />
-        </joint>
-        <joint name="body_wheel1">
+
+        <joint name="base_wheel_tr">
             <command_interface name="velocity" />
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="body_wheel2">
+        <joint name="base_wheel_br">
             <command_interface name="velocity" />
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="body_wheel3">
+        <joint name="base_wheel_tl">
             <command_interface name="velocity" />
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="body_wheel4">
+        <joint name="base_wheel_bl">
             <command_interface name="velocity" />
             <state_interface name="velocity" />
             <state_interface name="position" />
