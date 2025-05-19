@@ -27,7 +27,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>100 100</size>
+              <size>1000 1000</size>
             </plane>
           </geometry>
           <surface>
@@ -35,14 +35,14 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+
           </surface>
         </collision>
         <visual name='visual'>
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>100 100</size>
+              <size>1000 1000</size>
             </plane>
           </geometry>
           <material>
@@ -66,8 +66,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
-      <spot>
-        <inner_angle>0</inner_angle>
+      <spot>base <inner_angle>0</inner_angle>
         <outer_angle>0</outer_angle>
         <falloff>0</falloff>
       </spot>

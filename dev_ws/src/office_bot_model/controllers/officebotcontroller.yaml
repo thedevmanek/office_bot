@@ -1,45 +1,44 @@
 controller_manager:
   ros__parameters:
-    update_rate: 250 # Hz
+    use_sim_time: true
+    update_rate: 1000 # Hz
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
- 
 
-    joint_group_position_controller:
-      type: position_controllers/JointGroupPositionController
+    # joint_group_position_controller:
+    #   type: position_controllers/JointGroupPositionController
 
     mecanum_drive_controller:
       type: mecanum_drive_controller/MecanumDriveController
 
-joint_group_position_controller:
-  ros__parameters:
-    joints:
-      - base_drawer1
-      - base_drawer2
-      - base_drawer3
-      - base_drawer4
+# joint_group_position_controller:
+#   ros__parameters:
+#     joints:
+#       - base_drawer1
+#       - base_drawer2
+#       - base_drawer3
+#       - base_drawer4
 
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-  
+#     command_interfaces:
+#       - position
+#     state_interfaces:
+#       - position
+
 mecanum_drive_controller:
   ros__parameters:
-    reference_timeout: 0.9
-    front_left_wheel_command_joint_name: "base_wheel_tl"
-    front_right_wheel_command_joint_name: "base_wheel_tr"
-    rear_right_wheel_command_joint_name: "base_wheel_br"
-    rear_left_wheel_command_joint_name: "base_wheel_bl"
-
+    reference_timeout: 1.0 # max time between command messages before the vehicle should stop
+    front_left_wheel_command_joint_name: "base_wheel_fl"
+    front_right_wheel_command_joint_name: "base_wheel_fr"
+    rear_right_wheel_command_joint_name: "base_wheel_rr"
+    rear_left_wheel_command_joint_name: "base_wheel_rl"
     kinematics:
       base_frame_offset: { x: 0.0, y: 0.0, theta: 0.0 }
-      wheels_radius: 0.5
-      sum_of_robot_center_projection_on_X_Y_axis: 1.0
-
-    base_frame_id: "base"
+      wheels_radius: 0.025
+      sum_of_robot_center_projection_on_X_Y_axis: 1.1
+    use_stamped_vel: true
+    base_frame_id: "dummy_root_link"
     odom_frame_id: "odom"
     enable_odom_tf: true
-    twist_covariance_diagonal: [0.0, 7.0, 14.0, 21.0, 28.0, 35.0]
     pose_covariance_diagonal: [0.0, 7.0, 14.0, 21.0, 28.0, 35.0]
+    twist_covariance_diagonal: [0.0, 7.0, 14.0, 21.0, 28.0, 35.0]

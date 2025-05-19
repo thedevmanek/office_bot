@@ -8,7 +8,6 @@
         <child link="base" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
-
     <link name="base">
         <visual>
             <origin xyz="0 0 0" rpy="0 -0 0" />
@@ -16,8 +15,8 @@
                 <mesh filename="file:///opt/officebot/models/officebot/base.stl" />
             </geometry>
             <material name="base_material">
-                <color
-                    rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0" />
+                <color rgba="0.1 0.1 0.1 1.0" />
+                <specular>0.9 0.9 0.9 0.6</specular>
             </material>
         </visual>
         <collision>
@@ -29,10 +28,10 @@
         <inertial>
             <origin xyz="-1.1402394615806152526e-05 0.0058167257603785474732 0.20057979617316373799"
                 rpy="0 0 0" />
-            <mass value="15.348841199999997187" />
-            <inertia ixx="0.73742104771351546511" ixy="-1.8930735126360120308e-06"
-                ixz="3.8401508000569941443e-05" iyy="0.63465684290949331281"
-                iyz="-0.019589836025708705358" izz="0.35481063170305271459" />
+            <mass value="5" />
+            <inertia ixx="0.0369" ixy="0.0"
+                ixz="0.0" iyy="0.0317"
+                iyz="0.0" izz="0.0177" />
         </inertial>
     </link>
 
@@ -44,8 +43,8 @@
                 <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
             <material name="drawer_material">
-                <color
-                    rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
+                <color rgba="0.1 0.1 0.1 1.0" />
+                <specular>0.9 0.9 0.9 0.6</specular>
             </material>
         </visual>
         <collision>
@@ -58,7 +57,7 @@
         <inertial>
             <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="1.3157567401165588539" />
+            <mass value="0.5" />
             <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
                 ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
                 iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
@@ -84,8 +83,8 @@
                 <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
             <material name="drawer_material">
-                <color
-                    rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
+                <color rgba="0.1 0.1 0.1 1.0" />
+                <specular>0.9 0.9 0.9 0.6</specular>
             </material>
         </visual>
         <collision>
@@ -98,7 +97,7 @@
         <inertial>
             <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="1.3157567401165588539" />
+            <mass value="0.5" />
             <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
                 ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
                 iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
@@ -123,8 +122,8 @@
                 <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
             <material name="drawer_material">
-                <color
-                    rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
+                <color rgba="0.1 0.1 0.1 1.0" />
+                <specular>0.9 0.9 0.9 0.6</specular>
             </material>
         </visual>
         <collision>
@@ -137,7 +136,7 @@
         <inertial>
             <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="1.3157567401165588539" />
+            <mass value="0.5" />
             <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
                 ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
                 iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
@@ -162,8 +161,8 @@
                 <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
             </geometry>
             <material name="drawer_material">
-                <color
-                    rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0" />
+                <color rgba="0.1 0.1 0.1 1.0" />
+                <specular>0.9 0.9 0.9 0.6</specular>
             </material>
         </visual>
         <collision>
@@ -176,16 +175,12 @@
         <inertial>
             <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
                 rpy="0 0 0" />
-            <mass value="1.3157567401165588539" />
+            <mass value="0.5" />
             <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
                 ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
                 iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
         </inertial>
     </link>
-
-    <!-- <disable_collisions link1="drawer_1" link2="drawer_2" reason="Adjacent" />
-    <disable_collisions link1="drawer_2" link2="drawer_3" reason="Adjacent" />
-    <disable_collisions link1="drawer_3" link2="drawer_4" reason="Adjacent" /> -->
 
 
     <joint name="base_drawer4" type="prismatic">
@@ -198,7 +193,7 @@
 
     </joint>
 
-    <link name="wheel_tr">
+    <link name="wheel_fr">
         <visual>
             <origin
                 xyz="-1.2068141624910211362e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
@@ -207,16 +202,15 @@
                 <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
             <material name="wheel_material">
-                <color
-                    rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
+                <color rgba="0.2 0.2 0.2 1.0" />
             </material>
         </visual>
         <collision>
             <origin
                 xyz="-1.2068141624910211362e-11 -1.7179378986043047917e-07 -0.015750853796563685227"
-                rpy="1.570796326794896558 1.570796326794896558 0" />
+                rpy="0 0 0" />
             <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
+                <sphere radius="0.025" />
             </geometry>
         </collision>
         <inertial>
@@ -230,17 +224,18 @@
         </inertial>
     </link>
 
-    <joint name="base_wheel_tr" type="revolute">
+    <joint name="base_wheel_fr" type="continuous">
         <origin xyz="-0.14000000000000001332 -0.18080000000000001625 -0.025000000000000011796"
             rpy="6.7696525891777836328e-17 1.570796326794896558 0" />
         <parent link="base" />
-        <child link="wheel_tr" />
+        <child link="wheel_fr" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" />
+        <dynamics damping="0.2" />
+
 
     </joint>
 
-    <link name="wheel_br">
+    <link name="wheel_rr">
         <visual>
             <origin
                 xyz="-9.995476668578362478e-15 -1.7179980940640326992e-07 -0.015750853796563685227"
@@ -249,16 +244,16 @@
                 <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
             <material name="wheel_material">
-                <color
-                    rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
+                <color rgba="0.2 0.2 0.2 1.0" />
+
             </material>
         </visual>
         <collision>
             <origin
                 xyz="-9.995476668578362478e-15 -1.7179980940640326992e-07 -0.015750853796563685227"
-                rpy="1.570796326794896558 1.570796326794896558 0" />
+                rpy="0 0 0" />
             <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
+                <sphere radius="0.025" />
             </geometry>
         </collision>
         <inertial>
@@ -272,17 +267,17 @@
         </inertial>
     </link>
 
-    <joint name="base_wheel_br" type="revolute">
+    <joint name="base_wheel_rr" type="continuous">
         <origin xyz="-0.14000000000000001332 0.18080000000000001625 -0.025000000000000018735"
             rpy="3.141592653589793116 -1.570796326794896558 0" />
         <parent link="base" />
-        <child link="wheel_br" />
+        <child link="wheel_rr" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" />
+        <dynamics damping="0.2" />
 
     </joint>
 
-    <link name="wheel_tl">
+    <link name="wheel_fl">
         <visual>
             <origin
                 xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
@@ -291,16 +286,15 @@
                 <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
             <material name="wheel_material">
-                <color
-                    rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
+                <color rgba="0.2 0.2 0.2 1.0" />
             </material>
         </visual>
         <collision>
             <origin
                 xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
-                rpy="1.570796326794896558 1.570796326794896558 0" />
+                rpy="0 0 0" />
             <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
+                <sphere radius="0.025" />
             </geometry>
         </collision>
         <inertial>
@@ -314,17 +308,17 @@
         </inertial>
     </link>
 
-    <joint name="base_wheel_tl" type="revolute">
+    <joint name="base_wheel_fl" type="continuous">
         <origin xyz="0.14000000000000001332 -0.18080000000000001625 -0.025000000000000001388"
             rpy="-1.570796326794896558 -0 1.570796326794896558" />
         <parent link="base" />
-        <child link="wheel_tl" />
+        <child link="wheel_fl" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" />
+        <dynamics damping="0.2" />
 
     </joint>
 
-    <link name="wheel_bl">
+    <link name="wheel_rl">
         <visual>
             <origin
                 xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
@@ -333,16 +327,15 @@
                 <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
             </geometry>
             <material name="wheel_material">
-                <color
-                    rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0" />
+                <color rgba="0.2 0.2 0.2 1.0" />
             </material>
         </visual>
         <collision>
             <origin
                 xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
-                rpy="1.570796326794896558 1.570796326794896558 0" />
+                rpy="0 0 0" />
             <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
+                <sphere radius="0.025" />
             </geometry>
         </collision>
         <inertial>
@@ -356,13 +349,13 @@
         </inertial>
     </link>
 
-    <joint name="base_wheel_bl" type="revolute">
+    <joint name="base_wheel_rl" type="continuous">
         <origin xyz="0.13999999999999998557 0.1807999999999999885 -0.025000000000000001388"
             rpy="-1.570796326794896558 -0 1.570796326794896558" />
         <parent link="base" />
-        <child link="wheel_bl" />
+        <child link="wheel_rl" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" />
+        <dynamics damping="0.2" />
 
     </joint>
 
@@ -375,8 +368,7 @@
                 <mesh filename="file:///opt/officebot/models/officebot/lidar.stl" />
             </geometry>
             <material name="lidar_material">
-                <color
-                    rgba="0.76862745098039220171 0.88627450980392152857 0.95294117647058818044 1.0" />
+                <color rgba="0.05 0.05 0.05 1.0" />
             </material>
         </visual>
         <collision>
@@ -406,9 +398,68 @@
         <limit effort="10" velocity="20" lower="0.0" upper="0.35" />
 
     </joint>
+
+
+    <!-- Mecanum wheel friction properties -->
+    <gazebo reference="wheel_fl">
+        <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.1</mu>
+                        <mu2>0.0</mu2>
+                        <fdir1>1 -1 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
+        </collision>
+    </gazebo>
+
+    <gazebo reference="wheel_fr">
+        <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.1</mu>
+                        <mu2>0.0</mu2>
+                        <fdir1>1 1 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
+
+        </collision>
+    </gazebo>
+    <gazebo reference="wheel_rl">
+        <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.1</mu>
+                        <mu2>0.0</mu2>
+                        <fdir1>1 1 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
+        </collision>
+    </gazebo>
+    <gazebo reference="wheel_rr">
+        <collision>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.1</mu>
+                        <mu2>0.0</mu2>
+                        <fdir1>1 -1 0</fdir1>
+                    </ode>
+                </friction>
+            </surface>
+        </collision>
+    </gazebo>
+
+
     <ros2_control name="IgnitionSystem" type="system">
         <hardware>
-            <plugin>ign_ros2_control/IgnitionSystem</plugin>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
 
         <joint name="base_drawer1">
@@ -457,23 +508,35 @@
                 name="velocity" />
         </joint>
 
-        <joint name="base_wheel_tr">
-            <command_interface name="velocity" />
+        <joint name="base_wheel_fr">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="base_wheel_br">
-            <command_interface name="velocity" />
+        <joint name="base_wheel_rr">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="base_wheel_tl">
-            <command_interface name="velocity" />
+        <joint name="base_wheel_fl">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
-        <joint name="base_wheel_bl">
-            <command_interface name="velocity" />
+        <joint name="base_wheel_rl">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
             <state_interface name="velocity" />
             <state_interface name="position" />
         </joint>
@@ -481,11 +544,14 @@
 
     <!-- Gazebo Plugins -->
     <gazebo>
-        <plugin filename="ign_ros2_control-system"
-            name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
             <parameters>
                 /home/thedevmanek/office_bot/dev_ws/src/office_bot_model/controllers/officebotcontroller.yaml
             </parameters>
+            <ros>
+                <remapping>/mecanum_drive_controller/reference:=/cmd_vel</remapping>
+                <remapping>/mecanum_drive_controller/odometry:=/odom</remapping>
+            </ros>
         </plugin>
     </gazebo>
 

@@ -14,10 +14,17 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
-add_executable(drawers src/drawers.cpp)
+
+add_executable(drawers src/wheel.cpp)
 ament_target_dependencies(drawers 
-rclcpp  
+rclcpp
+tf2
+tf2_geometry_msgs
+nav_msgs  
 trajectory_msgs
 control_msgs)
 

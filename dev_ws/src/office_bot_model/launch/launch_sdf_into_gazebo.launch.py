@@ -9,13 +9,7 @@ from launch.substitutions import PathJoinSubstitution, FindExecutable, Command
 from launch.event_handlers import OnProcessExit
 
 def generate_launch_description():
-    robot_controllers = PathJoinSubstitution(
-        [
-            FindPackageShare("office_bot_model"),
-            "controllers",
-            "officebotcontroller.yaml",
-        ]
-    )
+
 
     world_description_path = PathJoinSubstitution(
         [
@@ -68,7 +62,7 @@ def generate_launch_description():
             "-file", robot_description_path,  # Use the SDF file directly
             "-x", "0",  # X position
             "-y", "0",  # Y position
-            "-z", "0.2" # Z position
+            "-z", "0.5" # Z position
         ],
         output="screen"
     )
@@ -76,23 +70,29 @@ def generate_launch_description():
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster",
-                    '--param-file',
-                    robot_controllers],
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager", "/controller_manager",
+        ],
+        output="screen",
     )
 
-    # Load controllers
-    load_drawers_controller = ExecuteProcess(
-            cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-                'joint_group_position_controller'],
-            output='screen'
-        )
-       # Load controllers
-    load_wheels_controller = ExecuteProcess(
-            cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-                'mecanum_drive_controller'],
-            output='screen'
-        )
+        # Load controllers
+    # Spawner for joint_group_position_controller
+    drawers_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_group_position_controller", "--controller-manager", "/controller_manager"],
+        output="screen",
+    )
+
+    # Spawner for mecanum_drive_controller
+    wheels_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["mecanum_drive_controller", "--controller-manager", "/controller_manager"],
+        output="screen",
+    )
     # Add RViz to the launch description
     rviz_config_path = PathJoinSubstitution(
         [
@@ -113,10 +113,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         robot_state_publisher_node,
-        spawn_robot,
         ignition_launch,
+        spawn_robot,
         joint_state_broadcaster_spawner,
-        load_drawers_controller,
-        load_wheels_controller,
-        # rviz_node  # Add RViz node here
+        drawers_controller_spawner,
+        wheels_controller_spawner,
+        # rviz_node
     ])
+
