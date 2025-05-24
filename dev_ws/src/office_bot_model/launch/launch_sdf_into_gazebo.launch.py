@@ -111,6 +111,15 @@ def generate_launch_description():
         arguments=["-d", rviz_config_path],  # Launch RViz with the configuration file
     )
 
+      # Bridge for LiDAR topic
+    gz_bridge_node=  Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='lidar_bridge',
+            arguments=['/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan','/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+            output='screen'
+        )
+
     return LaunchDescription([
         robot_state_publisher_node,
         ignition_launch,
@@ -118,6 +127,7 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         drawers_controller_spawner,
         wheels_controller_spawner,
-        # rviz_node
+        rviz_node,
+        gz_bridge_node
     ])
 

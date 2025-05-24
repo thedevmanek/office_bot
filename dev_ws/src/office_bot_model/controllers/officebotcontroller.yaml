@@ -6,24 +6,24 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    # joint_group_position_controller:
-    #   type: position_controllers/JointGroupPositionController
+    joint_group_position_controller:
+      type: position_controllers/JointGroupPositionController
 
     mecanum_drive_controller:
       type: mecanum_drive_controller/MecanumDriveController
 
-# joint_group_position_controller:
-#   ros__parameters:
-#     joints:
-#       - base_drawer1
-#       - base_drawer2
-#       - base_drawer3
-#       - base_drawer4
+joint_group_position_controller:
+  ros__parameters:
+    joints:
+      - base_drawer1
+      - base_drawer2
+      - base_drawer3
+      - base_drawer4
 
-#     command_interfaces:
-#       - position
-#     state_interfaces:
-#       - position
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
 
 mecanum_drive_controller:
   ros__parameters:

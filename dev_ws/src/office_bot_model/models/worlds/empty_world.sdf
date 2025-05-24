@@ -18,6 +18,9 @@
       name="ignition::gazebo::systems::UserCommands"></plugin>
     <plugin filename="ignition-gazebo-scene-broadcaster-system"
       name="ignition::gazebo::systems::SceneBroadcaster"></plugin>
+    <plugin filename="libignition-gazebo-imu-system.so"
+      name="ignition::gazebo::systems::Imu">
+    </plugin>
 
 
     <model name='ground_plane'>
