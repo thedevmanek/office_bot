@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Lidar -->
+    <link name="lidar">
+        <visual>
+            <origin xyz="-0.007700000000000000247 0.01465999999999999942 -0.0065699999999999647571"
+                rpy="3.141592653589793116 -0 0" />
+            <geometry>
+                <mesh filename="file:///opt/officebot/models/officebot/lidar.stl" />
+            </geometry>
+            <material name="lidar_material">
+                <color rgba="0.05 0.05 0.05 1.0" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.007700000000000000247 0.01465999999999999942 -0.0065699999999999647571"
+                rpy="3.141592653589793116 -0 0" />
+            <geometry>
+                <mesh filename="file:///opt/officebot/models/officebot/lidar.stl" />
+            </geometry>
+        </collision>
+        <inertial>
+            <origin
+                xyz="6.6596549691493207856e-05 6.0018681667141360325e-07 -0.032221019539936224252"
+                rpy="0 0 0" />
+            <mass value="0.14361062151864467662" />
+            <inertia ixx="7.6607929596010350621e-05" ixy="1.8546681181259822735e-11"
+                ixz="4.5008896873842006066e-08" iyy="9.446536275404850407e-05"
+                iyz="5.602593813075866145e-09" izz="8.7705899184357954826e-05" />
+        </inertial>
+    </link>
+
+    <joint name="base_lidar" type="fixed">
+        <origin xyz="0 0 0.64" rpy="3.141592653589793116 -0 0" />
+        <parent link="base" />
+        <child link="lidar" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <!-- Sensors -->
+    <gazebo reference="lidar">
+        <sensor name='unitree_l2_lidar' type='gpu_lidar'>
+            <pose>0 0 0.05 0 0 0</pose>
+            <update_rate>20</update_rate>
+            <lidar>
+                <scan>
+                    <horizontal>
+                        <samples>2000</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-3.14159265359</min_angle>
+                        <max_angle>3.14159265359</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>32</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.261799</min_angle>
+                        <max_angle>0.261799</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>40.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </lidar>
+            <always_on>1</always_on>
+            <visualize>true</visualize>
+        </sensor>
+    </gazebo>
+
+    <!-- IMU -->
+    <gazebo reference="base">
+        <sensor name="imu_sensor" type="imu">
+            <always_on>1</always_on>
+            <update_rate>1</update_rate>
+            <visualize>true</visualize>
+            <topic>imu</topic>
+        </sensor>
+    </gazebo>
+
+    <!-- ROS 2 Control -->
+    <ros2_control name="IgnitionSystem" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+
+        <joint name="base_drawer1">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="position">
+                <param name="initial_value">0</param>
+            </state_interface>
+            <state_interface name="velocity" />
+
+        </joint>
+        <joint name="base_drawer2">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">1</param>
+            </command_interface>
+
+            <state_interface name="position">
+                <param name="initial_value">0</param>
+            </state_interface>
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="base_drawer3">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">1</param>
+            </command_interface>
+
+            <state_interface name="position">
+                <param name="initial_value">0</param>
+            </state_interface>
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="base_drawer4">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface
+                name="position">
+                <param name="initial_value">0</param>
+            </state_interface>
+            <state_interface
+                name="velocity" />
+        </joint>
+
+        <joint name="base_wheel_fr">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="velocity" />
+            <state_interface name="position" />
+        </joint>
+        <joint name="base_wheel_rr">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="velocity" />
+            <state_interface name="position" />
+        </joint>
+        <joint name="base_wheel_fl">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="velocity" />
+            <state_interface name="position" />
+        </joint>
+        <joint name="base_wheel_rl">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="velocity" />
+            <state_interface name="position" />
+        </joint>
+    </ros2_control>
+
+    <!-- Gazebo Plugins -->
+    <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>
+                /home/thedevmanek/office_bot/dev_ws/src/office_bot_model/controllers/officebotcontroller.yaml</parameters>
+            <ros>
+                <remapping>/mecanum_drive_controller/reference:=/cmd_vel</remapping>
+                <remapping>/mecanum_drive_controller/odometry:=/odom</remapping>
+            </ros>
+        </plugin>
+        <plugin filename="libignition-gazebo-sensors-system.so"
+            name="ignition::gazebo::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
+    </gazebo>
+
+</robot>

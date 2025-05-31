@@ -360,7 +360,7 @@
     </joint>
 
 
-    <link name="lidar">
+    <link name="lidar_link">
         <visual>
             <origin xyz="-0.007700000000000000247 0.01465999999999999942 -0.0065699999999999647571"
                 rpy="3.141592653589793116 -0 0" />
@@ -393,7 +393,7 @@
         <origin xyz="1.561251128379126385e-17 -6.9388939039072283776e-18 0.64000000000000001332"
             rpy="3.141592653589793116 -0 0" />
         <parent link="base" />
-        <child link="lidar" />
+        <child link="lidar_link" />
         <axis xyz="0 0 1" />
         <limit effort="10" velocity="20" lower="0.0" upper="0.35" />
 
@@ -455,10 +455,11 @@
         </collision>
     </gazebo>
 
-    <gazebo reference="lidar">
+    <gazebo reference="lidar_link">
         <sensor name='unitree_l2_lidar' type='gpu_lidar'>
-            <pose relative_to='lidar'>0 0 0 0 0 0</pose>
+            <pose relative_to='lidar_link'>0 0 0 0 0 0</pose>
             <topic>lidar</topic>
+            <ignition_frame_id>lidar_link</ignition_frame_id>
             <update_rate>10</update_rate>
             <ray>
                 <scan>

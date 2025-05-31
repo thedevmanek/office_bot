@@ -15,7 +15,7 @@ def generate_launch_description():
         [
             FindPackageShare("office_bot_model"),
             "models",
-            "empty_world.sdf",  # Adjust this path as needed
+            'service.world'  # Adjust this path as needed
         ]
     )
 
@@ -61,8 +61,9 @@ def generate_launch_description():
             "-name", "office_bot",  # Name of the robot
             "-file", robot_description_path,  # Use the SDF file directly
             "-x", "0",  # X position
-            "-y", "0",  # Y position
+            "-y", "2",  # Y position
             "-z", "0.5" # Z position
+            
         ],
         output="screen"
     )
@@ -116,7 +117,8 @@ def generate_launch_description():
             package='ros_gz_bridge',
             executable='parameter_bridge',
             name='lidar_bridge',
-            arguments=['/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan','/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+            arguments=['/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked', '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+
             output='screen'
         )
 

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Drawer Macro -->
+    <xacro:macro name="drawer" params="prefix parent_link z_offset">
+        <link name="${prefix}">
+            <visual>
+                <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
+                    rpy="1.570796326794896558 -0 0" />
+                <geometry>
+                    <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
+                </geometry>
+                <material name="drawer_material">
+                    <color rgba="0.1 0.1 0.1 1.0" />
+                    <specular>0.9 0.9 0.9 0.6</specular>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
+                    rpy="1.570796326794896558 -0 0" />
+                <geometry>
+                    <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
+                </geometry>
+            </collision>
+            <inertial>
+                <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
+                    rpy="0 0 0" />
+                <mass value="0.5" />
+                <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
+                    ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
+                    iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
+            </inertial>
+        </link>
+
+        <joint name="base_${prefix}" type="prismatic">
+            <origin xyz="0.11500980138576723244 -0.20500000000000001554 ${z_offset}"
+                rpy="-1.570796326794896558 -0 3.141592653589793116" />
+            <parent link="${parent_link}" />
+            <child link="${prefix}" />
+            <axis xyz="0 0 1" />
+            <dynamics damping="0.1" friction="0.0" />
+            <limit effort="10" velocity="10" lower="0" upper="0.4" />
+        </joint>
+    </xacro:macro>
+
+    <!-- Create all drawers -->
+    <xacro:drawer prefix="drawer1" parent_link="base" z_offset="0.56999968326568606347" />
+    <xacro:drawer prefix="drawer_2" parent_link="base" z_offset="0.46999968326568986043" />
+    <xacro:drawer prefix="drawer_3" parent_link="base" z_offset="0.36999968326568610788" />
+    <xacro:drawer prefix="drawer_4" parent_link="base" z_offset="0.26999968326568613008" />
+
+</robot>
