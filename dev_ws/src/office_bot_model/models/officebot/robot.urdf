@@ -1,10 +1,10 @@
 <robot name="officebot">
-    <link name="dummy_root_link">
+    <link name="base_footprint">
         <!-- No inertial element here -->
     </link>
 
     <joint name="dummy_root" type="fixed">
-        <parent link="dummy_root_link" />
+        <parent link="base_footprint" />
         <child link="base" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
@@ -592,7 +592,16 @@
             <ros>
                 <remapping>/mecanum_drive_controller/reference:=/cmd_vel</remapping>
                 <remapping>/mecanum_drive_controller/odometry:=/odom</remapping>
+                <remapping>/mecanum_drive_controller/tf_odometry:=/tf</remapping>
             </ros>
+        </plugin>
+
+        <plugin filename="ignition-gazebo-user-commands-system"
+            name="ignition::gazebo::systems::UserCommands"></plugin>
+        <plugin filename="ignition-gazebo-scene-broadcaster-system"
+            name="ignition::gazebo::systems::SceneBroadcaster"></plugin>
+        <plugin filename="libignition-gazebo-imu-system.so"
+            name="ignition::gazebo::systems::Imu">
         </plugin>
         <plugin
             filename="libignition-gazebo-sensors-system.so"

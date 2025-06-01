@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, RegisterEventHandler
+from launch.actions import ExecuteProcess, IncludeLaunchDescription
 from launch_ros.actions import Node  
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import PathJoinSubstitution, FindExecutable, Command
@@ -117,7 +118,7 @@ def generate_launch_description():
             package='ros_gz_bridge',
             executable='parameter_bridge',
             name='lidar_bridge',
-            arguments=['/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked', '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+            arguments=['/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked','/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan', '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
 
             output='screen'
         )
@@ -130,6 +131,7 @@ def generate_launch_description():
         drawers_controller_spawner,
         wheels_controller_spawner,
         rviz_node,
-        gz_bridge_node
+        gz_bridge_node,
+ 
     ])
 
