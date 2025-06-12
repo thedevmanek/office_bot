@@ -313,7 +313,7 @@
             rpy="-1.570796326794896558 -0 1.570796326794896558" />
         <parent link="base" />
         <child link="wheel_fl" />
-        <axis xyz="0 0 1" />
+        <axis xyz="0 0 -1" />
         <dynamics damping="0.2" />
 
     </joint>
@@ -354,7 +354,7 @@
             rpy="-1.570796326794896558 -0 1.570796326794896558" />
         <parent link="base" />
         <child link="wheel_rl" />
-        <axis xyz="0 0 1" />
+        <axis xyz="0 0 -1" />
         <dynamics damping="0.2" />
 
     </joint>
@@ -392,11 +392,9 @@
     <joint name="base_lidar" type="fixed">
         <origin xyz="1.561251128379126385e-17 -6.9388939039072283776e-18 0.64000000000000001332"
             rpy="3.141592653589793116 -0 0" />
-        <parent link="base" />
+        <parent link="base_footprint" />
         <child link="lidar_link" />
         <axis xyz="0 0 1" />
-        <limit effort="10" velocity="20" lower="0.0" upper="0.35" />
-
     </joint>
 
 
@@ -406,9 +404,9 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>0.1</mu>
-                        <mu2>0.0</mu2>
-                        <fdir1>1 -1 0</fdir1>
+                        <mu>1.0</mu>
+                        <mu2>0.012</mu2>
+                        <fdir1>1 1 0</fdir1>
                     </ode>
                 </friction>
             </surface>
@@ -419,8 +417,8 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>0.1</mu>
-                        <mu2>0.0</mu2>
+                        <mu>1.0</mu>
+                        <mu2>0.012</mu2>
                         <fdir1>1 1 0</fdir1>
                     </ode>
                 </friction>
@@ -433,8 +431,8 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>0.1</mu>
-                        <mu2>0.0</mu2>
+                        <mu>1.0</mu>
+                        <mu2>0.012</mu2>
                         <fdir1>1 1 0</fdir1>
                     </ode>
                 </friction>
@@ -446,8 +444,8 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>0.1</mu>
-                        <mu2>0.0</mu2>
+                        <mu>1.0</mu>
+                        <mu2>0.012</mu2>
                         <fdir1>1 -1 0</fdir1>
                     </ode>
                 </friction>
@@ -489,7 +487,7 @@
 
     </gazebo>
 
-    <gazebo reference="base">
+    <gazebo reference="base_footprint">
         <sensor name="imu_sensor" type="imu">
             <always_on>1</always_on>
             <update_rate>1</update_rate>

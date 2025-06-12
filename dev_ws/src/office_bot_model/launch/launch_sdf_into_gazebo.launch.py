@@ -4,9 +4,9 @@ from launch import LaunchDescription
 from launch.actions import ExecuteProcess, IncludeLaunchDescription
 from launch_ros.actions import Node  
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
+import os
 from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import PathJoinSubstitution, FindExecutable, Command
+from launch.substitutions import PathJoinSubstitution, FindExecutable, Command,LaunchConfiguration
 from launch.event_handlers import OnProcessExit
 
 def generate_launch_description():
@@ -16,7 +16,7 @@ def generate_launch_description():
         [
             FindPackageShare("office_bot_model"),
             "models",
-            'service.world'  # Adjust this path as needed
+            'empty_world.sdf'  # Adjust this path as needed
         ]
     )
 
@@ -40,7 +40,7 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             output='screen',
-            parameters=[{'robot_description': robot_description}],
+            parameters=[{'robot_description': robot_description,'use_sim_time': True}],
     )
     # Gazebo Ignition Launch
     ignition_launch = ExecuteProcess(
@@ -110,19 +110,57 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2",
         output="screen",
-        arguments=["-d", rviz_config_path],  # Launch RViz with the configuration file
+        arguments=["-d", rviz_config_path,],  # Launch RViz with the configuration file
+        parameters=[{'use_sim_time': True}]
+
     )
 
       # Bridge for LiDAR topic
-    gz_bridge_node=  Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            name='lidar_bridge',
-            arguments=['/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked','/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan', '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+    gz_bridge_node = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='lidar_bridge',
+        arguments=[
+            '/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
+            '/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
+            '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'
+        ],
+        parameters=[{'use_sim_time': True}],
+        output='screen'
+    )
 
-            output='screen'
-        )
+    
+    find_ekf=PathJoinSubstitution(
+        [
+            FindPackageShare("office_bot_model"),
+            "controllers",
+            "ekf.yaml",  # Adjust this path to your specific RViz configuration file
 
+        ]
+    )
+    robot_localization_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_node',
+        output='screen',
+        parameters=[find_ekf, {'use_sim_time': True}]
+    )
+    find_slam_yaml=PathJoinSubstitution(
+        [
+            FindPackageShare("office_bot_model"),
+            "controllers",
+            "slam_toolbox.yaml",  # Adjust this path to your specific RViz configuration file
+
+        ]
+    )
+    
+    slam_toolbox_node = Node(
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen',
+        parameters=[find_slam_yaml, {'use_sim_time': True}]
+    )
     return LaunchDescription([
         robot_state_publisher_node,
         ignition_launch,
@@ -132,6 +170,8 @@ def generate_launch_description():
         wheels_controller_spawner,
         rviz_node,
         gz_bridge_node,
+        # robot_localization_node,
+        slam_toolbox_node
  
     ])
 

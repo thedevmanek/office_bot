@@ -19,6 +19,7 @@
   <exec_depend>gz_ros2_control</exec_depend>
   <exec_depend>ign_ros2_control</exec_depend>
   <exec_depend>mecanum_drive_controller</exec_depend>
+  <exec_depend>robot_localization</exec_depend>
 
 
   <test_depend>ament_copyright</test_depend>
