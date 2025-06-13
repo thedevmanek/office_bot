@@ -55,16 +55,17 @@ private:
         {
         case 0:
             start_x_ = latest_x_;
-            publish_twist(0.0, 0.5, 0.0); // left
-            publish_twist(0.0, 0.5, 0.0); // left
-            publish_twist(0.0, 0.5, 0.0); // left
+            publish_twist(0.5, 0.0, 0.0); // forward
+            publish_twist(0.5, 0.0, 0.0); // forward
+            publish_twist(0.5, 0.0, 0.0); // forward
 
             break;
         case 1:
             check_movement(latest_x_ > start_x_, "Forward");
-            publish_twist(0.0, 0.5, 0.0); // left
-            publish_twist(0.0, 0.5, 0.0); // left
-            publish_twist(0.0, 0.5, 0.0); // left
+            publish_twist(-0.5, 0.0, 0.0); // backward
+            publish_twist(-0.5, 0.0, 0.0); // backward
+            publish_twist(-0.5, 0.0, 0.0); // backward
+
             break;
         case 2:
             check_movement(latest_x_ < start_x_, "Backward");
