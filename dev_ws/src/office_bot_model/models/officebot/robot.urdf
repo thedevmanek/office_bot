@@ -7,7 +7,7 @@
     <joint name="dummy_root" type="fixed">
         <parent link="base_footprint" />
         <child link="base" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 1.57" />
     </joint>
     <link name="base">
         <visual>
@@ -393,7 +393,7 @@
     <joint name="base_lidar" type="fixed">
         <origin xyz="1.561251128379126385e-17 -6.9388939039072283776e-18 0.64000000000000001332"
             rpy="3.141592653589793116 -0 0" />
-        <parent link="base_footprint" />
+        <parent link="base" />
         <child link="lidar_link" />
         <axis xyz="0 0 1" />
     </joint>
@@ -405,7 +405,7 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>1.0</mu>
+                        <mu>2.0</mu>
                         <mu2>0.0</mu2>
                         <fdir1 ignition:expressed_in='base_footprint'>1 -1 0</fdir1>
                     </ode>
@@ -418,7 +418,7 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>1.0</mu>
+                        <mu>2.0</mu>
                         <mu2>0.0</mu2>
                         <fdir1 ignition:expressed_in='base_footprint'>1 1 0</fdir1>
                     </ode>
@@ -432,7 +432,7 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>1.0</mu>
+                        <mu>2.0</mu>
                         <mu2>0.0</mu2>
                         <fdir1 ignition:expressed_in='base_footprint'>1 1 0</fdir1>
                     </ode>
@@ -445,7 +445,7 @@
             <surface>
                 <friction>
                     <ode>
-                        <mu>1.0</mu>
+                        <mu>2.0</mu>
                         <mu2>0.0</mu2>
                         <fdir1 ignition:expressed_in='base_footprint'>1 -1 0</fdir1>
                     </ode>

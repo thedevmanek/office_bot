@@ -16,7 +16,7 @@ def generate_launch_description():
         [
             FindPackageShare("office_bot_model"),
             "models",
-            'empty_world.sdf'  # Adjust this path as needed
+            'service.world'  # Adjust this path as needed
         ]
     )
 
@@ -170,7 +170,7 @@ def generate_launch_description():
         wheels_controller_spawner,
         rviz_node,
         gz_bridge_node,
-        # robot_localization_node,
+        robot_localization_node,
         slam_toolbox_node
  
     ])
