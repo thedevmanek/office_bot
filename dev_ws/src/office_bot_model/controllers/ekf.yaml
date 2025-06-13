@@ -32,7 +32,7 @@ ekf_node:
     base_link_frame: base_footprint # Defaults to "base_link" if unspecified
     world_frame: odom # Defaults to the value of odom_frame if unspecified
 
-    odom0: odom
+    odom0: demo/odom
     odom0_config:
       [
         false,
@@ -52,7 +52,7 @@ ekf_node:
         false,
       ]
 
-    imu0: imu
+    imu0: demo/imu
     imu0_config:
       [
         false,

@@ -589,7 +589,7 @@
                 /home/thedevmanek/office_bot/dev_ws/src/office_bot_model/controllers/officebotcontroller.yaml
             </parameters>
             <ros>
-                <remapping>/mecanum_drive_controller/reference:=/cmd_vel</remapping>
+                <remapping>/mecanum_drive_controller/reference:=/cmd_vel_stamped</remapping>
                 <remapping>/mecanum_drive_controller/odometry:=/odom</remapping>
                 <remapping>/mecanum_drive_controller/tf_odometry:=/tf</remapping>
             </ros>
