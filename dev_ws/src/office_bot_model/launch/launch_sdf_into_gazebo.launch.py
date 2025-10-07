@@ -6,7 +6,7 @@ from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import PathJoinSubstitution, FindExecutable, Command,LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution, FindExecutable, Command, LaunchConfiguration
 from launch.event_handlers import OnProcessExit
 
 def generate_launch_description():
@@ -161,6 +161,32 @@ def generate_launch_description():
         output='screen',
         parameters=[find_slam_yaml, {'use_sim_time': True}]
     )
+
+    nav2_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('nav2_bringup'),
+                'launch',
+                'navigation_launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'params_file': PathJoinSubstitution([
+                FindPackageShare("office_bot_model"),
+                "controllers",
+                "nav2_params.yaml"
+            ]),
+            'use_sim_time': 'true',
+            'slam': 'True'
+        }.items()
+    )
+        # Add CmdVelStamper Node
+    cmd_vel_stamper_node = Node(
+        package='office_bot_controller_handlers',  # Replace with your actual package name
+        executable='velstamper',  # This should match the name of your compiled executable
+        name='velstamper',
+        output='screen'
+    )
     return LaunchDescription([
         robot_state_publisher_node,
         ignition_launch,
@@ -171,7 +197,9 @@ def generate_launch_description():
         rviz_node,
         gz_bridge_node,
         robot_localization_node,
-        slam_toolbox_node
+        slam_toolbox_node,
+        cmd_vel_stamper_node,
+        nav2_launch
  
     ])
 

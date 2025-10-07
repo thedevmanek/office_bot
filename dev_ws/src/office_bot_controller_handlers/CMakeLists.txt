@@ -19,8 +19,8 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
 
-add_executable(drawers src/wheel.cpp)
-ament_target_dependencies(drawers 
+add_executable(velstamper src/velstamper.cpp)
+ament_target_dependencies(velstamper 
 rclcpp
 tf2
 tf2_geometry_msgs
@@ -29,7 +29,7 @@ trajectory_msgs
 control_msgs)
 
 install(TARGETS
-  drawers
+  velstamper
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
