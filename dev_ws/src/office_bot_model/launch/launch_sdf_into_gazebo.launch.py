@@ -119,11 +119,14 @@ def generate_launch_description():
     gz_bridge_node = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        name='lidar_bridge',
+        name='gazebo_bridge',
         arguments=[
             '/lidar/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
+            '/clock@rosgraph_msgs/msg/Clock@gz.msgs.Clock',
             '/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
-            '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'
+            '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU',
+            '/camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image',
+            '/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
         ],
         parameters=[{'use_sim_time': True}],
         output='screen'
@@ -153,7 +156,33 @@ def generate_launch_description():
 
         ]
     )
-    
+    # from launch_ros.actions import ComposableNodeContainer
+    # from launch_ros.descriptions import ComposableNode
+
+    # composable_nodes = [
+    #         ComposableNode(
+    #             package='image_proc',
+    #             plugin='image_proc::RectifyNode',
+    #             name='rectify_node',
+    #             namespace='camera',
+    #             remappings=[
+    #                 ('image', 'image_raw'),
+    #                 ('image_rect', 'image_rectified'),
+    #             ],
+    #             parameters=[{'use_sim_time': True},
+    #                         {'queue_size': 10},
+    #                 {'approximate_sync': True}],
+    #         )
+    #     ]
+
+    # img_proc = ComposableNodeContainer(
+    #         name='image_proc_container',
+    #         package='rclcpp_components',
+    #         executable='component_container',
+    #         namespace= 'camera',
+    #         composable_node_descriptions=composable_nodes,
+    #     )
+
     slam_toolbox_node = Node(
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
@@ -187,19 +216,40 @@ def generate_launch_description():
         name='velstamper',
         output='screen'
     )
-    return LaunchDescription([
-        robot_state_publisher_node,
-        ignition_launch,
-        spawn_robot,
+
+
+
+    def start_after_spawn():
+        return [
+        robot_localization_node,
+        slam_toolbox_node,
+        nav2_launch,
+        rviz_node,
+        gz_bridge_node,
+        cmd_vel_stamper_node,
         joint_state_broadcaster_spawner,
         drawers_controller_spawner,
         wheels_controller_spawner,
-        rviz_node,
-        gz_bridge_node,
-        robot_localization_node,
-        slam_toolbox_node,
-        cmd_vel_stamper_node,
-        nav2_launch
- 
-    ])
+        # img_proc
+    ]
+
+    from launch.actions import RegisterEventHandler
+    from launch.event_handlers import OnProcessExit
+
+    launch_description = [
+        robot_state_publisher_node,
+        ignition_launch,
+        spawn_robot,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawn_robot,
+                on_exit=start_after_spawn()
+            )
+        ),
+    ]
+
+
+
+    return LaunchDescription(
+        launch_description)
 

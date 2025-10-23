@@ -36,45 +36,6 @@
         </inertial>
     </link>
 
-    <link name="drawer1">
-        <visual>
-            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
-                rpy="1.570796326794896558 -0 0" />
-            <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
-            </geometry>
-            <material name="drawer_material">
-                <color rgba="0.5 0.5 0.5 1.0" />
-                <specular>0.9 0.9 0.9 0.6</specular>
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="0.015004444442000011706 1.0500000000000000444 -0.20100000000000001199"
-                rpy="1.570796326794896558 -0 0" />
-            <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/drawer.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <origin xyz="0.11500444463622183644 0.017863356300829913437 -0.20135771129566992776"
-                rpy="0 0 0" />
-            <mass value="0.5" />
-            <inertia ixx="0.025117376745737180627" ixy="4.6518674608217020318e-12"
-                ixz="-2.9189657039480768947e-11" iyy="0.033720984998443788438"
-                iyz="-2.441660906402222698e-05" izz="0.011129479641923002015" />
-        </inertial>
-    </link>
-
-    <joint name="base_drawer1" type="prismatic">
-        <origin xyz="0.11500980138576723244 -0.20500000000000001554 0.56999968326568606347"
-            rpy="-1.570796326794896558 -0 3.141592653589793116" />
-        <parent link="base" />
-        <child link="drawer1" />
-        <axis xyz="0 0 1" />
-        <dynamics damping="0.1" friction="0.0" />
-        <limit effort="10" velocity="10" lower="0" upper="0.4" />
-
-    </joint>
 
     <link name="drawer_2">
         <visual>
@@ -397,6 +358,72 @@
         <child link="lidar_link" />
         <axis xyz="0 0 1" />
     </joint>
+    <joint name="camera_joint" type="fixed">
+        <origin xyz="1.561251128379126385e-17 -0.21 0.62000000000000001332"
+            rpy="3.141592653589793116 -0 0" />
+        <parent link="base" />
+        <child link="camera_link" />
+        <axis xyz="0 0 1" />
+    </joint>
+    <link name="camera_link">
+        <visual>
+            <geometry>
+                <box size="0.030 0.003 0.03" />
+            </geometry>
+            <material name="camera_material">
+                <color rgba="0.05 0.8 0.05 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="3.14 0 1.57" />
+        <parent link="camera_link" />
+        <child link="camera_link_optical" />
+    </joint>
+    <link name="camera_link_optical"></link>
+    <gazebo reference="camera_link_optical">
+        <sensor name="camera" type="camera">
+            <always_on>true</always_on>
+            <visualize>true</visualize>
+            <update_rate>30</update_rate>
+            <topic>camera/image_raw</topic>
+            <gz_frame_id>camera_link_optical</gz_frame_id>
+            <camera name="intel_realsense_r200">
+                <horizontal_fov>2.97</horizontal_fov>
+                <image>
+                    <width>3840</width>
+                    <height>2160</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                </clip>
+                <!-- Intrinsics (fx, fy, cx, cy) -->
+                <intrinsics>
+                    <fx>613.52214502</fx>
+                    <fy>563.13948541</fy>
+                    <cx>283.04846119</cx>
+                    <cy>260.43066317</cy>
+                </intrinsics>
+
+                <!-- Distortion coefficients (k1, k2, p1, p2, k3) -->
+                <distortion>
+                    <k1>-0.467652511</k1>
+                    <k2>7.24487497</k2>
+                    <p1>0.00873816137</p1>
+                    <p2>0.0603649760</p2>
+                    <k3>-54.7462075</k3>
+                </distortion>
+
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+        </sensor>
+    </gazebo>
 
 
     <!-- Mecanum wheel friction properties -->
