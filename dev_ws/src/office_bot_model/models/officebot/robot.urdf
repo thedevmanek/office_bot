@@ -389,7 +389,7 @@
             <topic>camera/image_raw</topic>
             <gz_frame_id>camera_link_optical</gz_frame_id>
             <camera name="intel_realsense_r200">
-                <horizontal_fov>2.97</horizontal_fov>
+                <horizontal_fov>1.04</horizontal_fov>
                 <image>
                     <width>3840</width>
                     <height>2160</height>
