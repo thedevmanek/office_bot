@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Wheel Macro -->
+    <xacro:macro name="wheel" params="prefix x_offset y_offset rpy_offset">
+        <link name="wheel_${prefix}">
+            <visual>
+                <origin
+                    xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
+                    rpy="1.570796326794896558 1.570796326794896558 0" />
+                <geometry>
+                    <mesh filename="file:///opt/officebot/models/officebot/wheel.stl" />
+                </geometry>
+                <material name="wheel_material">
+                    <color rgba="0.2 0.2 0.2 1.0" />
+                </material>
+            </visual>
+            <collision>
+                <origin
+                    xyz="-1.2068152033251067223e-11 -1.7179378985002213831e-07 -0.015750853796563685227"
+                    rpy="0 0 0" />
+                <geometry>
+                    <sphere radius="0.025" />
+                </geometry>
+            </collision>
+            <inertial>
+                <origin
+                    xyz="-0.00012384960631778565098 1.7288366540316698738e-08 -0.014664740164935676989"
+                    rpy="0 0 0" />
+                <mass value="0.021505374555847410478" />
+                <inertia ixx="4.5670776315593607919e-06" ixy="4.6693190007475188061e-12"
+                    ixz="-2.8901187565512819888e-09" iyy="4.6149952980252317969e-06"
+                    iyz="-3.7205436020749213202e-09" izz="6.8500077196540731277e-06" />
+            </inertial>
+        </link>
+
+        <joint name="base_wheel_${prefix}" type="continuous">
+            <origin xyz="${x_offset} ${y_offset} -0.025000000000000001388"
+                rpy="${rpy_offset}" />
+            <parent link="base" />
+            <child link="wheel_${prefix}" />
+            <axis xyz="0 0 1" />
+            <dynamics damping="0.2" />
+        </joint>
+
+        <gazebo reference="wheel_${prefix}">
+            <collision>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.1</mu>
+                            <mu2>0.0</mu2>
+                            <xacro:if value="${y_offset > 0}">
+                                <fdir1>1 1 0</fdir1>
+                            </xacro:if>
+                            <xacro:unless value="${y_offset > 0}">
+                                <fdir1>1 -1 0</fdir1>
+                            </xacro:unless>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- Create all wheels -->
+    <xacro:wheel prefix="fr" x_offset="-0.14" y_offset="-0.1808"
+        rpy_offset="6.7696525891777836328e-17 1.570796326794896558 0" />
+    <xacro:wheel prefix="fl" x_offset="0.14" y_offset="-0.1808"
+        rpy_offset="-1.570796326794896558 -0 1.570796326794896558" />
+    <xacro:wheel prefix="rr" x_offset="-0.14" y_offset="0.1808"
+        rpy_offset="3.141592653589793116 -1.570796326794896558 0" />
+    <xacro:wheel prefix="rl" x_offset="0.14" y_offset="0.1808"
+        rpy_offset="-1.570796326794896558 -0 1.570796326794896558" />
+
+</robot>

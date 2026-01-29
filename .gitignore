@@ -43,9 +43,13 @@ qtcreator-*
 /planning/src
 
 *~
-
+/.vscode/*
 # Emacs
 .#*
+/dev_ws/install/*
+/dev_ws/log/*
+/dev_ws/build/*
 
 # Catkin custom files
 CATKIN_IGNORE
+dev_ws/.vscode/settings.json
