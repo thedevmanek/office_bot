@@ -11,24 +11,33 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+import xacro
+
+
+def _expanded_robot_description(package_share, mesh_uri_prefix, controller_config_path):
+    robot_description_path = os.path.join(
+        package_share, "models", "officebot_xacro", "main.xacro"
+    )
+    return xacro.process_file(
+        robot_description_path,
+        mappings={
+            "mesh_uri_prefix": mesh_uri_prefix,
+            "controller_config_path": controller_config_path,
+        },
+    ).toxml()
 
 
 def _configured_robot_description(package_share):
-    robot_description_path = os.path.join(
-        package_share, "models", "officebot", "robot.urdf"
-    )
     controller_config_path = os.path.join(
         package_share, "controllers", "officebotcontroller.yaml"
     )
     package_mesh_prefix = "package://office_bot_model/models/officebot/"
     gazebo_mesh_prefix = f"file://{package_share}/models/officebot/"
-
-    with open(robot_description_path, "r", encoding="utf-8") as robot_file:
-        robot_description = robot_file.read().replace(
-            "@OFFICEBOT_CONTROLLER_CONFIG@", controller_config_path
-        )
-    gazebo_robot_description = robot_description.replace(
-        package_mesh_prefix, gazebo_mesh_prefix
+    robot_description = _expanded_robot_description(
+        package_share, package_mesh_prefix, controller_config_path
+    )
+    gazebo_robot_description = _expanded_robot_description(
+        package_share, gazebo_mesh_prefix, controller_config_path
     )
 
     temp_robot = tempfile.NamedTemporaryFile(
@@ -94,17 +103,6 @@ def generate_launch_description():
         executable="spawner",
         arguments=[
             "joint_state_broadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-        output="screen",
-    )
-
-    drawers_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "joint_group_position_controller",
             "--controller-manager",
             "/controller_manager",
         ],
@@ -188,6 +186,13 @@ def generate_launch_description():
         executable="velstamper",
         name="velstamper",
         output="screen",
+        parameters=[
+            {
+                "use_sim_time": True,
+                "publish_rate": 30.0,
+                "input_timeout": 2.0,
+            }
+        ],
     )
 
     def start_after_spawn():
@@ -199,7 +204,6 @@ def generate_launch_description():
             gz_bridge_node,
             cmd_vel_stamper_node,
             joint_state_broadcaster_spawner,
-            drawers_controller_spawner,
             wheels_controller_spawner,
         ]
 

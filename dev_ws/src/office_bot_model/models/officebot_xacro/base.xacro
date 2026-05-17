@@ -1,37 +1,236 @@
-<?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <link name="dummy_root_link" />
-
-    <joint name="dummy_root" type="fixed">
-        <parent link="dummy_root_link" />
-        <child link="base" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-    </joint>
-
-    <link name="base">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/base.stl" />
-            </geometry>
-            <material name="base_material">
-                <color rgba="0.1 0.1 0.1 1.0" />
-                <specular>0.9 0.9 0.9 0.6</specular>
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 -0 0" />
-            <geometry>
-                <mesh filename="file:///opt/officebot/models/officebot/base.stl" />
-            </geometry>
-        </collision>
-        <inertial>
-            <origin xyz="-1.1402394615806152526e-05 0.0058167257603785474732 0.20057979617316373799"
-                rpy="0 0 0" />
-            <mass value="5" />
-            <inertia ixx="0.0369" ixy="0.0" ixz="0.0"
-                iyy="0.0317" iyz="0.0" izz="0.0177" />
-        </inertial>
-    </link>
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="officebot_base">
+    <xacro:macro name="officebot_base" params="mesh_uri_prefix">
+        <link name="base_footprint"></link>
+        <joint name="dummy_root" type="fixed">
+            <parent link="base_footprint"></parent>
+            <child link="base"></child>
+            <origin xyz="0 0 0.05" rpy="0 0 1.57"></origin>
+        </joint>
+        <link name="base">
+            <visual>
+                <origin xyz="2.1538861131079210576e-05 5.2264522704986715596e-05 0.69700000000000006395" rpy="-1.276289952752453768e-16 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar_cap_bottom.stl"></mesh>
+                </geometry>
+                <material name="lidar_cap_bottom_material">
+                    <color rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="2.1538861131079210576e-05 5.2264522704986715596e-05 0.69700000000000006395" rpy="-1.276289952752453768e-16 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar_cap_bottom.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="-0.039978461138868923164 -0.039947735477295027995 0.67500000000000004441" rpy="3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+                <material name="91292a073_18-8_stainless_steel_socket_head_screw_material">
+                    <color rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="-0.039978461138868923164 -0.039947735477295027995 0.67500000000000004441" rpy="3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="-0.039978461138868916225 0.04005226452270497367 0.67500000000000004441" rpy="3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+                <material name="91292a073_18-8_stainless_steel_socket_head_screw_material">
+                    <color rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="-0.039978461138868916225 0.04005226452270497367 0.67500000000000004441" rpy="3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.039999999999999980016 -0.039999999999999986955 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+                <material name="93655a262_male-female_threaded_hex_standoff_material">
+                    <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.039999999999999980016 -0.039999999999999986955 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.088000000000000008771 -0.16320000000000001172 0.66200000000000003286" rpy="3.141592653589793116 1.5770213417971000254e-16 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}camera.stl"></mesh>
+                </geometry>
+                <material name="camera_material">
+                    <color rgba="0.91764705882352937127 0.91764705882352937127 0.91764705882352937127 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.088000000000000008771 -0.16320000000000001172 0.66200000000000003286" rpy="3.141592653589793116 1.5770213417971000254e-16 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}camera.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="2.1538861131077668976e-05 0.0011480437628363371338 0.69100000000000005862" rpy="-1.276289952752453768e-16 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}plate.stl"></mesh>
+                </geometry>
+                <material name="plate_material">
+                    <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="2.1538861131077668976e-05 0.0011480437628363371338 0.69100000000000005862" rpy="-1.276289952752453768e-16 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}plate.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="-0.039999999999999993894 -0.039999999999999973077 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+                <material name="93655a262_male-female_threaded_hex_standoff_material">
+                    <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="-0.039999999999999993894 -0.039999999999999973077 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}base.stl"></mesh>
+                </geometry>
+                <material name="base_material">
+                    <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}base.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.00027231756027094530803 -0.00075989928100567150082 0.73028953015198128096" rpy="0 -0 -1.570796326794896558"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar_rain_top.stl"></mesh>
+                </geometry>
+                <material name="lidar_rain_top_material">
+                    <color rgba="0.29803921568627450567 0.29803921568627450567 0.29803921568627450567 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.00027231756027094530803 -0.00075989928100567150082 0.73028953015198128096" rpy="0 -0 -1.570796326794896558"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar_rain_top.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.040021538314784332879 -0.039947736771962089053 0.67500000000000004441" rpy="-3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+                <material name="91292a073_18-8_stainless_steel_socket_head_screw_material">
+                    <color rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.040021538314784332879 -0.039947736771962089053 0.67500000000000004441" rpy="-3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="-0.0076784611388689208433 -0.014607735477295019644 0.70535953015098928898" rpy="0 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar.stl"></mesh>
+                </geometry>
+                <material name="lidar_material">
+                    <color rgba="0.76862745098039220171 0.88627450980392152857 0.95294117647058818044 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="-0.0076784611388689208433 -0.014607735477295019644 0.70535953015098928898" rpy="0 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}lidar.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.040021538314784353696 0.040052263228037905674 0.67500000000000004441" rpy="-3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+                <material name="91292a073_18-8_stainless_steel_socket_head_screw_material">
+                    <color rgba="0.64705882352941179736 0.64705882352941179736 0.64705882352941179736 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.040021538314784353696 0.040052263228037905674 0.67500000000000004441" rpy="-3.141592653589793116 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}91292a073_18_8_stainless_steel_socket_head_screw.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="-0.039978461138868916225 0.040052264522704966732 0.64000000000000001332" rpy="-1.570796326794896558 -0 3.141592653589793116"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+                <material name="93655a262_male-female_threaded_hex_standoff_material">
+                    <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="-0.039978461138868916225 0.040052264522704966732 0.64000000000000001332" rpy="-1.570796326794896558 -0 3.141592653589793116"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0.040000000000000000833 0.040000000000000007772 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+                <material name="93655a262_male-female_threaded_hex_standoff_material">
+                    <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"></color>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0.040000000000000000833 0.040000000000000007772 0.64000000000000001332" rpy="-1.570796326794896558 -0 0"></origin>
+                <geometry>
+                    <mesh filename="${mesh_uri_prefix}93655a262_male_female_threaded_hex_standoff.stl"></mesh>
+                </geometry>
+            </collision>
+            <inertial>
+                <origin xyz="-1.0480396050031999557e-05 0.0057636639617425411072 0.20546884607802526346" rpy="0 0 0"></origin>
+                <mass value="15.49143394549887276"></mass>
+                <inertia ixx="0.77734852159115797043" ixy="-1.8115077120170765664e-06" ixz="3.0848972619884601877e-05" iyy="0.67459748065292401975" iyz="-0.01915723532918278682" izz="0.35489977220502227917"></inertia>
+            </inertial>
+        </link>
+        <gazebo reference="base_footprint">
+            <sensor name="imu_sensor" type="imu">
+                <always_on>1</always_on>
+                <update_rate>1</update_rate>
+                <visualize>true</visualize>
+                <topic>imu</topic>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
 </robot>

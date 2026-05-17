@@ -1,10 +1,22 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="officebot">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:ignition="http://gazebosim.org/schema"
+       name="office_bot">
+    <xacro:arg name="mesh_uri_prefix" default="package://office_bot_model/models/officebot/" />
+    <xacro:arg name="controller_config_path" default="$(find-pkg-share office_bot_model)/controllers/officebotcontroller.yaml" />
 
-    <!-- Include all component xacro files -->
+    <xacro:property name="mesh_uri_prefix" value="$(arg mesh_uri_prefix)" />
+    <xacro:property name="controller_config_path" value="$(arg controller_config_path)" />
+
     <xacro:include filename="base.xacro" />
     <xacro:include filename="drawers.xacro" />
     <xacro:include filename="wheels.xacro" />
     <xacro:include filename="sensors.xacro" />
+    <xacro:include filename="control.xacro" />
 
+    <xacro:officebot_base mesh_uri_prefix="${mesh_uri_prefix}" />
+    <xacro:officebot_drawers mesh_uri_prefix="${mesh_uri_prefix}" />
+    <xacro:officebot_wheels mesh_uri_prefix="${mesh_uri_prefix}" />
+    <xacro:officebot_sensors />
+    <xacro:officebot_control controller_config_path="${controller_config_path}" />
 </robot>
