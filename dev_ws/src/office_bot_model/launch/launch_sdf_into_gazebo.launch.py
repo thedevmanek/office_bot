@@ -11,6 +11,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from nav2_common.launch import ReplaceString
 import xacro
 
 
@@ -164,6 +165,10 @@ def generate_launch_description():
         parameters=[slam_config_path, {"use_sim_time": True}],
     )
 
+    nav2_config_path = ReplaceString(
+        source_file=os.path.join(package_share, "controllers", "nav2_params.yaml"),
+        replacements={"<office_bot_model_share>": package_share},
+    )
     nav2_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -173,9 +178,7 @@ def generate_launch_description():
             ]
         ),
         launch_arguments={
-            "params_file": os.path.join(
-                package_share, "controllers", "nav2_params.yaml"
-            ),
+            "params_file": nav2_config_path,
             "use_sim_time": "true",
             "slam": "True",
         }.items(),
@@ -194,6 +197,7 @@ def generate_launch_description():
             }
         ],
     )
+
 
     def start_after_spawn():
         return [

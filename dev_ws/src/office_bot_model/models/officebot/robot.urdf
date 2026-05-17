@@ -525,13 +525,19 @@
     <child link="camera_link"/>
     <axis xyz="0 0 1"/>
   </joint>
-  <link name="camera_link_optical"/>
-  <joint name="camera_optical_joint" type="fixed">
+  <link name="camera_sensor_link"/>
+  <joint name="camera_sensor_joint" type="fixed">
     <origin rpy="3.14 0 1.57" xyz="0 0 0"/>
     <parent link="camera_link"/>
+    <child link="camera_sensor_link"/>
+  </joint>
+  <link name="camera_link_optical"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0 0 0"/>
+    <parent link="camera_sensor_link"/>
     <child link="camera_link_optical"/>
   </joint>
-  <gazebo reference="camera_link_optical">
+  <gazebo reference="camera_sensor_link">
     <sensor name="camera" type="camera">
       <always_on>true</always_on>
       <visualize>true</visualize>
@@ -583,13 +589,13 @@
             <resolution>1</resolution>
             <min_angle>-3.14159265359</min_angle>
             <max_angle>3.14159265359</max_angle>
-          </horizontal>
-          <vertical>
-            <samples>32</samples>
-            <resolution>1</resolution>
-            <min_angle>-0.261799</min_angle>
-            <max_angle>0.261799</max_angle>
-          </vertical>
+        </horizontal>
+        <vertical>
+          <samples>32</samples>
+          <resolution>1</resolution>
+          <min_angle>-0.261799</min_angle>
+          <max_angle>0.261799</max_angle>
+        </vertical>
         </scan>
         <range>
           <min>0.1</min>

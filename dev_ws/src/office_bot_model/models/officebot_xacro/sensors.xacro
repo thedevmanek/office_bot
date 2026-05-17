@@ -15,13 +15,19 @@
             <child link="camera_link"></child>
             <axis xyz="0 0 1"></axis>
         </joint>
-        <link name="camera_link_optical"></link>
-        <joint name="camera_optical_joint" type="fixed">
+        <link name="camera_sensor_link"></link>
+        <joint name="camera_sensor_joint" type="fixed">
             <origin xyz="0 0 0" rpy="3.14 0 1.57"></origin>
             <parent link="camera_link"></parent>
+            <child link="camera_sensor_link"></child>
+        </joint>
+        <link name="camera_link_optical"></link>
+        <joint name="camera_optical_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="-1.5707963267948966 0 -1.5707963267948966"></origin>
+            <parent link="camera_sensor_link"></parent>
             <child link="camera_link_optical"></child>
         </joint>
-        <gazebo reference="camera_link_optical">
+        <gazebo reference="camera_sensor_link">
             <sensor name="camera" type="camera">
                 <always_on>true</always_on>
                 <visualize>true</visualize>

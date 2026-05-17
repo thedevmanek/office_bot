@@ -29,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -82,7 +82,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         camera_link_optical:
           Alpha: 1
           Show Axes: false
@@ -111,7 +110,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         wheel_fl:
           Alpha: 1
           Show Axes: false
@@ -220,16 +218,29 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /camera/image_raw
+        Value: /camera/image_detections
       Value: true
       Visibility:
         Grid: true
         Image: true
         Map: true
+        MarkerArray: true
         PointCloud2: true
         RobotModel: true
         Value: false
       Zoom Factor: 1
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /detected_objects_markers
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
