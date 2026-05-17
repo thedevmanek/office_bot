@@ -1,0 +1,14 @@
+{
+    "configuration": "default",
+    "documentId": "363d0613b2cbfd0cbb6ba24e",
+    "documentMicroversion": "b12afe8ea7596d84e1987202",
+    "documentVersion": "12b998c761871a8f9cefc13f",
+    "elementId": "746351cd0640696920b2e1d0",
+    "fullConfiguration": "default",
+    "id": "MdJg6qqERsURtmGrS",
+    "isStandardContent": false,
+    "name": "lidar_rain_top <1>",
+    "partId": "JFD",
+    "suppressed": false,
+    "type": "Part"
+}

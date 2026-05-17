@@ -4,6 +4,7 @@ import os
 
 package_name = 'office_bot_model'
 
+
 def package_files(directory):
     paths = []
     for (path, _, filenames) in os.walk(directory):
@@ -19,13 +20,8 @@ data_files = [
     ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
     ('share/' + package_name + '/config', glob('config/*.rviz')),
     ('share/' + package_name + '/controllers', glob('controllers/*.yaml')),
-    ('share/' + package_name + '/models', glob('models/officebot/*.urdf')),
-    ('share/' + package_name + '/models', glob('models/worlds/*.sdf')),
-    ('share/' + package_name + '/models', glob('models/worlds/office_world/*.world'))
-
-
 ]
-
+data_files.extend(package_files('models'))
 
 
 setup(

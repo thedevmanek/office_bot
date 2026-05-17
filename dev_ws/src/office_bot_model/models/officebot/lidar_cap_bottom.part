@@ -1,0 +1,14 @@
+{
+    "configuration": "default",
+    "documentId": "f31e8c1329fd4abc080cbd85",
+    "documentMicroversion": "84ed818ff40a36df966a9ad6",
+    "documentVersion": "df3724275e421490db77bcb7",
+    "elementId": "6bfa515ae2bbbf1c63774b77",
+    "fullConfiguration": "default",
+    "id": "M5xztkOYeyIEu6AKk",
+    "isStandardContent": false,
+    "name": "lidar_cap_bottom <1>",
+    "partId": "JFD",
+    "suppressed": false,
+    "type": "Part"
+}

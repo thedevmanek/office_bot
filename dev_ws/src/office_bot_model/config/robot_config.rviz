@@ -87,6 +87,11 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        drawer_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         drawer_2:
           Alpha: 1
           Show Axes: false
