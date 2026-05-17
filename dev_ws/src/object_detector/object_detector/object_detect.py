@@ -1,131 +1,593 @@
-import rclpy
-from rclpy.node import Node
-from sensor_msgs.msg import Image
-from visualization_msgs.msg import Marker, MarkerArray
-from geometry_msgs.msg import PointStamped
-from cv_bridge import CvBridge
+import base64
+import math
+import threading
+
 import cv2
 import numpy as np
-import torch
+import rclpy
+import sensor_msgs_py.point_cloud2 as point_cloud2
 import tf2_ros
-from tf2_geometry_msgs import do_transform_point
-from yolox.exp import get_exp
-from yolox.utils import postprocess
+from cv_bridge import CvBridge
+from rclpy.node import Node
+from sensor_msgs.msg import CameraInfo, Image, LaserScan, PointCloud2
+from std_msgs.msg import Header
+from visualization_msgs.msg import Marker, MarkerArray
+
+from object_detector.datatypes import NavigationStatus
+from object_detector.localization import LocalizationConfig, ObjectLocalizer
+from object_detector.model import ObjectDetectorModel
+from object_detector.navigation import NavigationConfig, ObjectNavigator
+from object_detector.tracking import TrackManager, footprint_points
+from object_detector.web import ObjectHuntWebServer
+
 
 class ObjectDetectionNode(Node):
     def __init__(self):
-        super().__init__('object_detection_node')
+        super().__init__("object_detection_node")
+
+        self.params = self._declare_parameters()
         self.bridge = CvBridge()
+        self.state_lock = threading.Lock()
+        self.nav_status = NavigationStatus()
 
-        # Subscribers
-        self.image_sub = self.create_subscription(
-            Image, '/camera/image_raw', self.image_callback, 10)
-        
-        # Publishers
-        self.marker_pub = self.create_publisher(MarkerArray, '/detected_objects_markers', 10)
-        self.image_pub = self.create_publisher(Image, '/camera/image_detections', 10)
-
-        # TF setup
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+        self.localizer = ObjectLocalizer(
+            self._localization_config(), self.tf_buffer, self.get_logger()
+        )
+        self.tracks = TrackManager(
+            self.params["cluster_radius_m"],
+            self.params["confirmed_association_radius_m"],
+            int(self.params["min_confirmations"]),
+            self.params["track_timeout_s"],
+            self.params["freeze_confirmed_tracks"],
+            self.params["duplicate_track_merge_radius_m"],
+        )
+        self.navigator = ObjectNavigator(
+            self,
+            self._navigation_config(),
+            self.localizer._lookup_transform,
+            self.localizer.track_has_line_of_sight,
+            self._set_status,
+        )
+        self.detector = ObjectDetectorModel(
+            self.params["ckpt_path"],
+            self.params["class_names_path"],
+            self.params["confidence_threshold"],
+            self.params["min_bbox_area_ratio"],
+            logger=self.get_logger(),
+        )
 
-        # Model Loading
-        exp = get_exp(None, "yolox-m")
-        self.model = exp.get_model()
-        self.model.eval()
+        self._create_ros_interfaces()
+        if not self.detector.load():
+            self._set_status("model_unavailable", self.detector.status_message)
+        self.web_server = ObjectHuntWebServer(
+            self,
+            self.params["web_host"],
+            int(self.params["web_port"]),
+            self.get_logger(),
+        ).start()
 
-        ckpt = torch.load("/home/thedevmanek/office_bot/dev_ws/src/object_detector/resource/yolox_m.pth", map_location="cpu")
-        self.model.load_state_dict(ckpt["model"])
-        
-        if hasattr(self.model, "head") and hasattr(self.model.head, "decode_in_inference"):
-            self.model.head.decode_in_inference = True
+    def _declare_parameters(self):
+        defaults = {
+            "confidence_threshold": 0.55,
+            "scan_window_deg": 2.0,
+            "bbox_sector_padding_deg": 4.0,
+            "range_cluster_jump_m": 0.75,
+            "min_lidar_points_per_object": 2,
+            "min_bbox_area_ratio": 0.0002,
+            "max_detection_range_m": 8.0,
+            "reliable_detection_range_m": 4.0,
+            "min_position_confidence": 0.05,
+            "use_projected_pointcloud": True,
+            "publish_projection_debug": True,
+            "sofa_min_observed_radius_m": 0.35,
+            "chair_max_observed_radius_m": 1.10,
+            "default_object_radius_m": 0.5,
+            "surface_obstacle_radius_m": 0.25,
+            "obstacle_radius_padding_m": 0.1,
+            "max_object_radius_m": 1.2,
+            "projected_foreground_depth_margin_m": 0.35,
+            "max_sensor_time_delta_s": 0.25,
+            "line_of_sight_clearance_m": 0.35,
+            "obstacle_point_spacing_m": 0.15,
+            "obstacle_point_min_z_m": 0.05,
+            "obstacle_point_max_z_m": 0.75,
+            "obstacle_point_z_spacing_m": 0.15,
+            "cluster_radius_m": 0.75,
+            "confirmed_association_radius_m": 1.5,
+            "duplicate_track_merge_radius_m": 1.5,
+            "freeze_confirmed_tracks": True,
+            "min_confirmations": 2,
+            "track_timeout_s": 12.0,
+            "approach_offset_m": 1.2,
+            "min_approach_offset_m": 1.05,
+            "close_stop_distance_m": 0.95,
+            "dynamic_replan_min_interval_s": 2.0,
+            "dynamic_replan_min_shift_m": 0.25,
+            "dynamic_replan_min_confidence_gain": 0.15,
+            "dynamic_replanning_enabled": False,
+            "max_object_goal_distance_m": 5.0,
+            "goal_candidate_angle_step_deg": 30.0,
+            "max_approach_angle_offset_deg": 75.0,
+            "nav_action_server_timeout_s": 5.0,
+            "camera_horizontal_fov": 1.04,
+            "camera_forward_axis": "z",
+            "ray_projection_depth_m": 10.0,
+            "lidar_bearing_offset_deg": 0.0,
+            "web_host": "127.0.0.1",
+            "web_port": 8080,
+            "lidar_frame": "lidar_link",
+            "map_frame": "map",
+            "base_frame": "base_footprint",
+            "ckpt_path": "",
+            "class_names_path": "",
+        }
+        return {
+            name: self.declare_parameter(name, default).value
+            for name, default in defaults.items()
+        }
 
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model.to(self.device)
-        self.get_logger().info(f"YOLOX-M active on {self.device}. Publishing to /camera/image_detections")
+    def _localization_config(self):
+        return LocalizationConfig(
+            scan_window_deg=self.params["scan_window_deg"],
+            bbox_sector_padding_deg=self.params["bbox_sector_padding_deg"],
+            range_cluster_jump_m=self.params["range_cluster_jump_m"],
+            min_lidar_points_per_object=int(
+                self.params["min_lidar_points_per_object"]
+            ),
+            max_detection_range_m=self.params["max_detection_range_m"],
+            reliable_detection_range_m=self.params["reliable_detection_range_m"],
+            min_position_confidence=self.params["min_position_confidence"],
+            use_projected_pointcloud=self.params["use_projected_pointcloud"],
+            sofa_min_observed_radius_m=self.params["sofa_min_observed_radius_m"],
+            chair_max_observed_radius_m=self.params["chair_max_observed_radius_m"],
+            default_object_radius_m=self.params["default_object_radius_m"],
+            obstacle_radius_padding_m=self.params["obstacle_radius_padding_m"],
+            max_object_radius_m=self.params["max_object_radius_m"],
+            projected_foreground_depth_margin_m=self.params[
+                "projected_foreground_depth_margin_m"
+            ],
+            max_sensor_time_delta_s=self.params["max_sensor_time_delta_s"],
+            line_of_sight_clearance_m=self.params["line_of_sight_clearance_m"],
+            camera_horizontal_fov=self.params["camera_horizontal_fov"],
+            camera_forward_axis=self.params["camera_forward_axis"],
+            ray_projection_depth_m=self.params["ray_projection_depth_m"],
+            lidar_bearing_offset_rad=math.radians(
+                self.params["lidar_bearing_offset_deg"]
+            ),
+            lidar_frame=self.params["lidar_frame"],
+            map_frame=self.params["map_frame"],
+        )
 
-        self.classes = [line.strip() for line in open("/home/thedevmanek/office_bot/dev_ws/src/object_detector/resource/coco.names", "r").readlines()]
-        self.test_size = exp.test_size 
+    def _navigation_config(self):
+        return NavigationConfig(
+            approach_offset_m=self.params["approach_offset_m"],
+            min_approach_offset_m=self.params["min_approach_offset_m"],
+            close_stop_distance_m=self.params["close_stop_distance_m"],
+            dynamic_replan_min_interval_s=self.params[
+                "dynamic_replan_min_interval_s"
+            ],
+            dynamic_replan_min_shift_m=self.params["dynamic_replan_min_shift_m"],
+            dynamic_replan_min_confidence_gain=self.params[
+                "dynamic_replan_min_confidence_gain"
+            ],
+            dynamic_replanning_enabled=self.params["dynamic_replanning_enabled"],
+            max_object_goal_distance_m=self.params["max_object_goal_distance_m"],
+            goal_candidate_angle_step_deg=self.params["goal_candidate_angle_step_deg"],
+            max_approach_angle_offset_deg=self.params[
+                "max_approach_angle_offset_deg"
+            ],
+            nav_action_server_timeout_s=self.params["nav_action_server_timeout_s"],
+            map_frame=self.params["map_frame"],
+            base_frame=self.params["base_frame"],
+        )
 
-    def preprocess(self, img, input_size):
-        h, w = img.shape[:2]
-        r = min(input_size[0] / h, input_size[1] / w)
-        resized_img = cv2.resize(img, (int(w * r), int(h * r)), interpolation=cv2.INTER_LINEAR).astype(np.uint8)
-        padded_img = np.full((input_size[0], input_size[1], 3), 114, dtype=np.uint8)
-        padded_img[:int(h * r), :int(w * r)] = resized_img
-        padded_img = padded_img.transpose(2, 0, 1)
-        padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
-        return padded_img, r
+    def _create_ros_interfaces(self):
+        self.image_sub = self.create_subscription(
+            Image, "/camera/image_raw", self.image_callback, 1
+        )
+        self.camera_info_sub = self.create_subscription(
+            CameraInfo, "/camera/camera_info", self.camera_info_callback, 10
+        )
+        self.scan_sub = self.create_subscription(
+            LaserScan, "/lidar", self.scan_callback, 10
+        )
+        self.pointcloud_sub = self.create_subscription(
+            PointCloud2, "/lidar/points", self.pointcloud_callback, 10
+        )
+
+        self.marker_pub = self.create_publisher(
+            MarkerArray, "/detected_objects_markers", 10
+        )
+        self.image_pub = self.create_publisher(Image, "/camera/image_detections", 10)
+        self.projection_debug_pub = self.create_publisher(
+            Image, "/camera/projected_lidar_debug", 10
+        )
+        self.object_obstacle_pub = self.create_publisher(
+            PointCloud2, "/detected_object_obstacles", 1
+        )
+        self.projected_points_pub = self.create_publisher(
+            PointCloud2, "/detected_object_projected_points", 1
+        )
+        self.object_obstacle_timer = self.create_timer(
+            0.5, self.publish_object_obstacles
+        )
+
+    def camera_info_callback(self, msg):
+        self.localizer.set_camera_info(msg)
+
+    def scan_callback(self, msg):
+        self.localizer.set_scan(msg)
+
+    def pointcloud_callback(self, msg):
+        self.localizer.set_pointcloud(msg)
 
     def image_callback(self, msg):
-        # Convert ROS Image to OpenCV
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        h, w = cv_image.shape[:2]
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        except Exception as exc:
+            self._set_status("perception_error", f"Image conversion failed: {exc}")
+            return
 
-        # Inference
-        img, ratio = self.preprocess(cv_image, self.test_size)
-        tensor_img = torch.from_numpy(img).unsqueeze(0).to(self.device)
+        if not self.detector.ready:
+            self._draw_status_overlay(cv_image, self.get_nav_status()["message"])
+            self._publish_detection_image(msg, cv_image)
+            return
 
-        with torch.no_grad():
-            outputs = self.model(tensor_img)
-            outputs = postprocess(outputs, len(self.classes), 0.5, 0.45, class_agnostic=True)
+        detections = self.detector.detect(cv_image)
+        if detections:
+            self._handle_detections(msg, cv_image, detections)
+        else:
+            with self.state_lock:
+                confirmed_count = self.tracks.confirmed_count(self._now_seconds())
+            current_status = self.get_nav_status()
+            if (
+                current_status["state"]
+                in ("planning", "requested", "accepted", "succeeded")
+                and current_status["track_id"] is not None
+            ):
+                pass
+            elif confirmed_count:
+                self._set_status(
+                    "tracking",
+                    "No objects in frame; keeping "
+                    f"{confirmed_count} remembered object(s).",
+                )
+            else:
+                self._set_status("idle", "No objects currently detected.")
 
-        marker_array = MarkerArray()
-        id_counter = 0
+        self._publish_detection_image(msg, cv_image)
+        self.publish_track_markers()
 
-        if outputs[0] is not None:
-            output = outputs[0].cpu().numpy()
-            bboxes = output[:, 0:4] / ratio
-            scores = output[:, 4] * output[:, 5]
-            cls_ids = output[:, 6]
+    def _handle_detections(self, image_msg, cv_image, detections):
+        height, width = cv_image.shape[:2]
+        localized_count = 0
+        projected_cloud = self.localizer.project_latest_cloud_to_image(
+            image_msg, width, height
+        )
+        debug_image = (
+            cv_image.copy() if self.params["publish_projection_debug"] else None
+        )
+        debug_point_groups = []
 
-            for i in range(len(bboxes)):
-                x1, y1, x2, y2 = bboxes[i].astype(int)
-                conf = scores[i]
-                class_id = int(cls_ids[i])
-                
-                # Draw on the image
-                label = f"{self.classes[class_id]}: {conf:.2f}"
-                cv2.rectangle(cv_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(cv_image, label, (x1, max(0, y1 - 10)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        for detection in detections:
+            snapshot = self._detection_snapshot(cv_image, detection)
+            self._draw_detection(cv_image, detection)
+            projected_indices = self.localizer.foreground_projected_indices(
+                projected_cloud, detection
+            )
+            if debug_image is not None:
+                self.localizer.draw_projection_debug(
+                    debug_image, projected_cloud, projected_indices, detection
+                )
+            if projected_cloud is not None and len(projected_indices):
+                debug_point_groups.append(projected_cloud["points"][projected_indices])
 
-                # 3D Logic (Simplified marker placement)
-                pt = PointStamped()
-                pt.header.stamp = msg.header.stamp
-                pt.header.frame_id = msg.header.frame_id
-                pt.point.x = 2.0 
-                pt.point.y = -((x1 + x2) / 2.0 / w - 0.5) * 2.0
-                pt.point.z = -((y1 + y2) / 2.0 / h - 0.5) * 1.5
+            localization = self.localizer.localize_detection(
+                image_msg, projected_cloud, detection, width, height
+            )
+            if localization is None:
+                continue
 
-                try:
-                    transform = self.tf_buffer.lookup_transform('map', pt.header.frame_id, rclpy.time.Time())
-                    map_point = do_transform_point(pt, transform)
-                    
-                    marker = Marker()
-                    marker.header.frame_id = 'map'
-                    marker.header.stamp = self.get_clock().now().to_msg()
-                    marker.type = Marker.TEXT_VIEW_FACING
-                    marker.text = self.classes[class_id]
-                    marker.id = id_counter
-                    marker.pose.position = map_point.point
-                    marker.scale.z = 0.2
-                    marker.color.a = 1.0
-                    marker.color.r = 1.0
-                    marker.lifetime = rclpy.duration.Duration(seconds=0.1).to_msg()
-                    marker_array.markers.append(marker)
-                    id_counter += 1
-                except:
-                    continue
+            observed_radius = self.localizer.object_radius(
+                detection.class_name, localization.cluster
+            )
+            obstacle_radius = min(
+                observed_radius, self.params["surface_obstacle_radius_m"]
+            )
+            position_confidence = self.localizer.position_confidence(
+                detection.confidence, localization.cluster
+            )
+            with self.state_lock:
+                track_id = self.tracks.update_track(
+                    detection.class_name,
+                    localization.point,
+                    detection.confidence,
+                    obstacle_radius,
+                    position_confidence,
+                    self._now_seconds(),
+                    snapshot=snapshot,
+                )
+                track, _ = self.tracks.get_confirmed_track(
+                    track_id, self._now_seconds()
+                )
+            if track is not None:
+                self.navigator.observe_track(track)
+            localized_count += 1
 
-        # --- PUBLISH THE OUTPUT IMAGE ---
-        # Convert back to ROS Image message
+        with self.state_lock:
+            confirmed_count = self.tracks.confirmed_count(self._now_seconds())
+        current_status = self.get_nav_status()
+        if (
+            current_status["state"] in ("planning", "requested", "accepted", "succeeded")
+            and current_status["track_id"] is not None
+        ):
+            self._publish_projection_debug(
+                image_msg, debug_image, projected_cloud, debug_point_groups
+            )
+            return
+
+        if localized_count:
+            self._set_status(
+                "tracking",
+                f"Localized {localized_count} detection(s); "
+                f"{confirmed_count} confirmed object(s).",
+            )
+        else:
+            self._set_status(
+                "localization_unavailable",
+                "Objects detected, but localization was unavailable or outside range.",
+            )
+        self._publish_projection_debug(
+            image_msg, debug_image, projected_cloud, debug_point_groups
+        )
+
+    def _detection_snapshot(self, cv_image, detection):
+        height, width = cv_image.shape[:2]
+        x1 = max(0, min(width - 1, detection.x1))
+        y1 = max(0, min(height - 1, detection.y1))
+        x2 = max(0, min(width, detection.x2))
+        y2 = max(0, min(height, detection.y2))
+        if x2 <= x1 or y2 <= y1:
+            return None
+
+        crop = cv_image[y1:y2, x1:x2]
+        if crop.size == 0:
+            return None
+
+        max_width = 180
+        if crop.shape[1] > max_width:
+            scale = max_width / float(crop.shape[1])
+            crop = cv2.resize(
+                crop,
+                (max_width, max(1, int(round(crop.shape[0] * scale)))),
+                interpolation=cv2.INTER_AREA,
+            )
+
+        ok, buffer = cv2.imencode(
+            ".jpg", crop, [int(cv2.IMWRITE_JPEG_QUALITY), 78]
+        )
+        if not ok:
+            return None
+        encoded = base64.b64encode(buffer).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+
+    def _draw_status_overlay(self, cv_image, message):
+        cv2.putText(
+            cv_image,
+            message[:120],
+            (24, 48),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 0, 220),
+            2,
+        )
+
+    def _draw_detection(self, cv_image, detection):
+        label = f"{detection.class_name}: {detection.confidence:.2f}"
+        cv2.rectangle(
+            cv_image,
+            (detection.x1, detection.y1),
+            (detection.x2, detection.y2),
+            (0, 180, 80),
+            3,
+        )
+        cv2.putText(
+            cv_image,
+            label,
+            (detection.x1, max(24, detection.y1 - 10)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 180, 80),
+            2,
+        )
+
+    def _publish_detection_image(self, image_msg, cv_image):
         detection_msg = self.bridge.cv2_to_imgmsg(cv_image, encoding="bgr8")
-        detection_msg.header = msg.header  # Keep original timestamp and frame_id
+        detection_msg.header = image_msg.header
         self.image_pub.publish(detection_msg)
 
-        # Publish Markers
+    def _publish_projection_debug(
+        self, image_msg, debug_image, projected_cloud, debug_point_groups
+    ):
+        if debug_image is not None:
+            debug_msg = self.bridge.cv2_to_imgmsg(debug_image, encoding="bgr8")
+            debug_msg.header = image_msg.header
+            self.projection_debug_pub.publish(debug_msg)
+
+        if projected_cloud is None:
+            frame_id = self.params["lidar_frame"]
+            stamp = image_msg.header.stamp
+            points = []
+        elif debug_point_groups:
+            frame_id, stamp, points = self._map_stabilized_debug_points(
+                projected_cloud, debug_point_groups
+            )
+        else:
+            frame_id = projected_cloud["frame_id"]
+            stamp = projected_cloud["stamp"]
+            points = []
+
+        header = Header()
+        header.frame_id = frame_id
+        header.stamp = stamp
+        cloud = point_cloud2.create_cloud_xyz32(header, points)
+        self.projected_points_pub.publish(cloud)
+
+    def _map_stabilized_debug_points(self, projected_cloud, debug_point_groups):
+        points = np.vstack(debug_point_groups).astype(np.float32)
+        stamp = projected_cloud["stamp"]
+        source_frame = projected_cloud["frame_id"]
+
+        try:
+            transform = self.localizer._lookup_transform(
+                self.params["map_frame"], source_frame, stamp
+            )
+            points = self.localizer._transform_points(points, transform)
+            frame_id = self.params["map_frame"]
+        except Exception as exc:
+            self.get_logger().debug(f"Projection debug map transform unavailable: {exc}")
+            frame_id = source_frame
+
+        return (
+            frame_id,
+            stamp,
+            [(float(x), float(y), float(z)) for x, y, z in points],
+        )
+
+    def publish_track_markers(self):
+        marker_array = MarkerArray()
+        now_msg = self.get_clock().now().to_msg()
+        delete_marker = Marker()
+        delete_marker.action = Marker.DELETEALL
+        marker_array.markers.append(delete_marker)
+
+        with self.state_lock:
+            tracks = self.tracks.confirmed_tracks(self._now_seconds())
+
+        for track in tracks:
+            marker_array.markers.append(self._make_sphere_marker(track, now_msg))
+            marker_array.markers.append(self._make_text_marker(track, now_msg))
+
         self.marker_pub.publish(marker_array)
+
+    def publish_object_obstacles(self):
+        with self.state_lock:
+            tracks = self.tracks.confirmed_tracks(self._now_seconds())
+
+        points = []
+        for track in tracks:
+            points.extend(
+                footprint_points(
+                    track,
+                    self.params["default_object_radius_m"],
+                    self.params["obstacle_point_spacing_m"],
+                    self.params["obstacle_point_min_z_m"],
+                    self.params["obstacle_point_max_z_m"],
+                    self.params["obstacle_point_z_spacing_m"],
+                )
+            )
+
+        header = Header()
+        header.frame_id = self.params["map_frame"]
+        header.stamp = self.get_clock().now().to_msg()
+        cloud = point_cloud2.create_cloud_xyz32(header, points)
+        self.object_obstacle_pub.publish(cloud)
+
+    def _make_sphere_marker(self, track, stamp):
+        marker = Marker()
+        marker.header.frame_id = self.params["map_frame"]
+        marker.header.stamp = stamp
+        marker.ns = "detected_object_surfaces"
+        marker.id = track["track_id"] * 2
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+        marker.pose.position.x = track["x"]
+        marker.pose.position.y = track["y"]
+        marker.pose.position.z = 0.15
+        diameter = 2.0 * track.get(
+            "obstacle_radius", self.params["surface_obstacle_radius_m"]
+        )
+        marker.scale.x = diameter
+        marker.scale.y = diameter
+        marker.scale.z = 0.25
+        marker.color.a = 0.9
+        marker.color.r = 0.05
+        marker.color.g = 0.65
+        marker.color.b = 0.30
+        return marker
+
+    def _make_text_marker(self, track, stamp):
+        marker = Marker()
+        marker.header.frame_id = self.params["map_frame"]
+        marker.header.stamp = stamp
+        marker.ns = "object_track_labels"
+        marker.id = track["track_id"] * 2 + 1
+        marker.type = Marker.TEXT_VIEW_FACING
+        marker.action = Marker.ADD
+        marker.text = f"{track['class_name']} #{track['track_id']}"
+        marker.pose.position.x = track["x"]
+        marker.pose.position.y = track["y"]
+        marker.pose.position.z = 0.45
+        marker.scale.z = 0.22
+        marker.color.a = 1.0
+        marker.color.r = 1.0
+        marker.color.g = 1.0
+        marker.color.b = 1.0
+        return marker
+
+    def get_track_classes(self):
+        with self.state_lock:
+            return self.tracks.classes(self._now_seconds())
+
+    def get_locations(self, class_name):
+        with self.state_lock:
+            return self.tracks.locations(class_name, self._now_seconds())
+
+    def get_nav_status(self):
+        with self.state_lock:
+            return self.nav_status.as_dict()
+
+    def clear_tracks(self):
+        with self.state_lock:
+            self.tracks.clear()
+            self.nav_status = NavigationStatus(
+                state="idle", message="Tracks cleared.", track_id=None
+            )
+        self.navigator.clear_plans()
+
+        marker = Marker()
+        marker.action = Marker.DELETEALL
+        marker_array = MarkerArray()
+        marker_array.markers.append(marker)
+        self.marker_pub.publish(marker_array)
+
+    def navigate_to_track(self, track_id):
+        with self.state_lock:
+            track, error = self.tracks.get_confirmed_track(track_id, self._now_seconds())
+            if error:
+                self.nav_status = NavigationStatus(
+                    state="error", message=error, track_id=track_id
+                )
+                return False, error
+
+        return self.navigator.navigate_to_track(track)
+
+    def _set_status(self, state, message, track_id=None):
+        with self.state_lock:
+            self.nav_status = NavigationStatus(
+                state=state, message=message, track_id=track_id
+            )
+
+    def _now_seconds(self):
+        return self.get_clock().now().nanoseconds / 1e9
+
+    def destroy_node(self):
+        if self.web_server is not None:
+            self.web_server.shutdown()
+        super().destroy_node()
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -134,8 +596,10 @@ def main(args=None):
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-    node.destroy_node()
-    rclpy.shutdown()
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

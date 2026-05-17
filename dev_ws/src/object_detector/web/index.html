@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Office Bot Object Hunt</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7f8;
+        --panel: #ffffff;
+        --ink: #18201f;
+        --muted: #63706d;
+        --line: #cfd8d5;
+        --soft: #eef3f1;
+        --accent: #126b4a;
+        --accent-strong: #0d5238;
+        --active: #dcebe5;
+        --warning: #946100;
+        --error: #a32121;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Aptos", "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1080px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 34px 0;
+      }
+
+      header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 4vw, 2.25rem);
+        font-weight: 780;
+        letter-spacing: 0;
+      }
+
+      .endpoint {
+        color: var(--muted);
+        font-size: 0.92rem;
+        white-space: nowrap;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+      }
+
+      .toolbar {
+        align-items: end;
+        display: grid;
+        grid-template-columns: minmax(170px, 260px) 1fr auto;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 760;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+      }
+
+      select,
+      button {
+        min-height: 40px;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        padding: 0 12px;
+      }
+
+      button {
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-weight: 760;
+        padding: 0 14px;
+      }
+
+      button.primary {
+        background: var(--accent);
+        color: white;
+      }
+
+      button.primary:hover {
+        background: var(--accent-strong);
+      }
+
+      button.secondary {
+        background: transparent;
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.52;
+      }
+
+      .summary {
+        color: var(--muted);
+        font-size: 0.92rem;
+        margin-bottom: 12px;
+      }
+
+      .track-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .track-row {
+        align-items: center;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: grid;
+        grid-template-columns: 96px 1fr auto;
+        gap: 14px;
+        min-height: 88px;
+        padding: 8px;
+      }
+
+      .track-row.active {
+        background: var(--active);
+        border-color: var(--accent);
+      }
+
+      .snapshot {
+        align-items: center;
+        aspect-ratio: 4 / 3;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        display: flex;
+        font-size: 0.78rem;
+        justify-content: center;
+        overflow: hidden;
+        width: 96px;
+      }
+
+      .snapshot img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+      }
+
+      .track-title {
+        font-size: 1rem;
+        font-weight: 780;
+        margin-bottom: 6px;
+      }
+
+      .track-meta {
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        gap: 10px;
+      }
+
+      .empty {
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        padding: 28px 18px;
+        text-align: center;
+      }
+
+      .status {
+        border-top: 1px solid var(--line);
+        margin-top: 18px;
+        padding-top: 16px;
+      }
+
+      .status-line {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
+        flex: 0 0 auto;
+      }
+
+      .dot.good {
+        background: var(--accent);
+      }
+
+      .dot.warn {
+        background: var(--warning);
+      }
+
+      .dot.bad {
+        background: var(--error);
+      }
+
+      .status-text {
+        line-height: 1.4;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 720px) {
+        main {
+          width: min(100vw - 22px, 1080px);
+          padding: 22px 0;
+        }
+
+        header,
+        .toolbar,
+        .track-row {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        header {
+          align-items: start;
+        }
+
+        .endpoint {
+          white-space: normal;
+        }
+
+        .track-row {
+          align-items: start;
+        }
+
+        .snapshot {
+          width: min(100%, 180px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Office Bot Object Hunt</h1>
+        <div class="endpoint" id="endpoint"></div>
+      </header>
+
+      <section class="panel">
+        <div class="toolbar">
+          <div>
+            <label for="classFilter">Object</label>
+            <select id="classFilter"></select>
+          </div>
+          <div class="summary" id="summaryText"></div>
+          <button class="secondary" id="clearButton">Clear Tracks</button>
+        </div>
+
+        <div class="track-list" id="trackList"></div>
+
+        <div class="status">
+          <div class="status-line">
+            <span class="dot" id="statusDot"></span>
+            <div class="status-text" id="statusText">Connecting...</div>
+          </div>
+          <div class="meta" id="metaText"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const classFilter = document.getElementById("classFilter");
+      const clearButton = document.getElementById("clearButton");
+      const endpoint = document.getElementById("endpoint");
+      const metaText = document.getElementById("metaText");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+      const summaryText = document.getElementById("summaryText");
+      const trackList = document.getElementById("trackList");
+
+      let activeTrackId = null;
+      let selectedClass = "";
+      let tracks = [];
+
+      endpoint.textContent = window.location.origin;
+
+      async function fetchJson(url, options) {
+        const response = await fetch(url, options);
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.error || payload.message || response.statusText);
+        }
+        return payload;
+      }
+
+      function setClassOptions(classes) {
+        const previous = classFilter.value;
+        classFilter.innerHTML = "";
+
+        const all = document.createElement("option");
+        all.value = "";
+        all.textContent = classes.length ? "All objects" : "No tracked objects";
+        classFilter.appendChild(all);
+
+        classes.forEach((className) => {
+          const option = document.createElement("option");
+          option.value = className;
+          option.textContent = className;
+          classFilter.appendChild(option);
+        });
+
+        if ([...classFilter.options].some((option) => option.value === previous)) {
+          classFilter.value = previous;
+        }
+        selectedClass = classFilter.value;
+      }
+
+      function formatNumber(value) {
+        return Number(value || 0).toFixed(2);
+      }
+
+      function renderTracks() {
+        trackList.innerHTML = "";
+        summaryText.textContent = tracks.length
+          ? `${tracks.length} remembered object${tracks.length === 1 ? "" : "s"}`
+          : "No remembered objects";
+
+        if (!tracks.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "No confirmed objects yet.";
+          trackList.appendChild(empty);
+          return;
+        }
+
+        tracks.forEach((track) => {
+          const row = document.createElement("div");
+          row.className = "track-row";
+          if (track.track_id === activeTrackId) {
+            row.classList.add("active");
+          }
+
+          const snapshot = document.createElement("div");
+          snapshot.className = "snapshot";
+          if (track.snapshot) {
+            const image = document.createElement("img");
+            image.src = track.snapshot;
+            image.alt = `${track.class_name} ${track.track_id}`;
+            snapshot.appendChild(image);
+          } else {
+            snapshot.textContent = "No image";
+          }
+
+          const details = document.createElement("div");
+          const title = document.createElement("div");
+          title.className = "track-title";
+          title.textContent = `${track.class_name} #${track.track_id}`;
+
+          const meta = document.createElement("div");
+          meta.className = "track-meta";
+          meta.innerHTML = `
+            <span>x ${formatNumber(track.x)}</span>
+            <span>y ${formatNumber(track.y)}</span>
+            <span>confidence ${Math.round((track.confidence || 0) * 100)}%</span>
+            <span>${track.detections || 0} detections</span>
+          `;
+
+          details.appendChild(title);
+          details.appendChild(meta);
+
+          const action = document.createElement("button");
+          action.className = "primary";
+          action.textContent = track.track_id === activeTrackId ? "Active" : "Navigate";
+          action.disabled = track.track_id === activeTrackId;
+          action.addEventListener("click", () => navigate(track.track_id));
+
+          row.appendChild(snapshot);
+          row.appendChild(details);
+          row.appendChild(action);
+          trackList.appendChild(row);
+        });
+      }
+
+      async function refreshClasses() {
+        const payload = await fetchJson("/api/classes");
+        setClassOptions(payload.classes);
+      }
+
+      async function refreshTracks() {
+        const className = encodeURIComponent(selectedClass || "");
+        const payload = await fetchJson(`/api/locations?class=${className}`);
+        tracks = payload.locations || [];
+        renderTracks();
+      }
+
+      async function refreshStatus() {
+        const status = await fetchJson("/api/status");
+        activeTrackId = status.track_id;
+        statusText.textContent = status.message || "No status.";
+        metaText.textContent = status.track_id ? `Track ${status.track_id}` : "";
+        statusDot.className = "dot";
+        if (["accepted", "requested", "tracking", "succeeded"].includes(status.state)) {
+          statusDot.classList.add("good");
+        } else if (["localization_unavailable", "idle", "finished"].includes(status.state)) {
+          statusDot.classList.add("warn");
+        } else if (["error", "rejected", "perception_error"].includes(status.state)) {
+          statusDot.classList.add("bad");
+        }
+      }
+
+      async function navigate(trackId) {
+        try {
+          const payload = await fetchJson("/api/navigate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ track_id: trackId }),
+          });
+          statusText.textContent = payload.message;
+          await refreshStatus();
+          renderTracks();
+        } catch (error) {
+          statusText.textContent = error.message;
+          statusDot.className = "dot bad";
+        }
+      }
+
+      async function clearTracks() {
+        await fetchJson("/api/clear", { method: "POST" });
+        tracks = [];
+        await refreshClasses();
+        await refreshTracks();
+        await refreshStatus();
+      }
+
+      classFilter.addEventListener("change", async () => {
+        selectedClass = classFilter.value;
+        await refreshTracks();
+      });
+      clearButton.addEventListener("click", clearTracks);
+
+      async function refreshAll() {
+        try {
+          await refreshClasses();
+          await refreshStatus();
+          await refreshTracks();
+        } catch (error) {
+          statusText.textContent = error.message;
+          statusDot.className = "dot bad";
+        }
+      }
+
+      refreshAll();
+      setInterval(refreshAll, 2000);
+    </script>
+  </body>
+</html>
