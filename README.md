@@ -1,10 +1,39 @@
 # OpenHRI Office Simulation
 
-OpenHRI Office Simulation is a ROS 2 Humble reference scenario for reproducible human-robot interaction research in office service environments.
+OpenHRI Office Simulation is a containerized ROS 2 Humble demo for repeatable human-robot interaction research in office service environments.
 
-This branch contains the containerized simulation preview, reference mobile robot model, navigation stack, object detection/localization pipeline, and browser-based object search console. Hardware-backed Raspberry Pi bringup lives on the `hardware` branch.
+It starts a browser-accessible desktop with Gazebo, RViz, Nav2, SLAM, a reference mobile robot, YOLOX-X object detection, object localization, object memory, and a web console for selecting objects and requesting navigation.
 
-## Fastest Preview
+This is the simulation branch. Raspberry Pi hardware bringup lives on the `hardware` branch.
+
+## What You Can Do
+
+- Run the full office simulation from a browser.
+- Watch the reference robot build a map and publish sensor data.
+- Detect everyday objects from the robot camera.
+- Localize confirmed objects with camera and lidar data.
+- Inspect object tracks in a web UI.
+- Send the robot to an approach pose near a selected object.
+- Modify detection, localization, navigation, UI, and study parameters.
+
+## Prerequisites
+
+- Podman with Compose support.
+- 8 GB or more free disk space for the image and model checkpoint.
+- A machine with enough memory for Gazebo, RViz, Nav2, and PyTorch CPU inference.
+- On macOS, a running Podman machine:
+
+```bash
+podman machine start
+```
+
+Apple Silicon macOS defaults to `linux/arm64`. Intel Linux and Windows users can run commands with:
+
+```bash
+OPENHRI_PLATFORM=linux/amd64
+```
+
+## Quickstart
 
 From the repository root:
 
@@ -18,13 +47,17 @@ Open the noVNC desktop:
 http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 ```
 
-Start the object detector and web console. This streams detector logs in the terminal:
+Launch the office simulation:
+
+```bash
+make sim
+```
+
+When Gazebo and RViz are running, start object detection in another terminal:
 
 ```bash
 make detector
 ```
-
-Press `Ctrl-C` to stop following the logs. The detector keeps running in the container; use `make detector-stop` to stop it.
 
 Open the object search console:
 
@@ -32,34 +65,65 @@ Open the object search console:
 http://localhost:8080/
 ```
 
-For a guided run, use [docs/quickstart.md](docs/quickstart.md).
+For a step-by-step walkthrough, use [docs/quickstart.md](docs/quickstart.md).
 
-## What To Look At
+## Expected First Run
 
-- **Office world**: Gazebo/Ignition assets for a repeatable indoor service environment.
-- **Reference robot**: robot model, sensors, controllers, TF frames, and RViz configuration.
-- **Autonomy stack**: Nav2, SLAM Toolbox, robot localization, ros2_control, and Gazebo bridge wiring.
-- **Object pipeline**: YOLOX-X detection, lidar/camera localization, track confirmation, obstacle publishing, and navigation-to-object support.
-- **Object search console**: browser UI for confirmed tracks, confidence, coordinates, navigation requests, and robot status.
+The first `make start` can take a while because it builds the ROS image, installs dependencies, installs YOLOX, and downloads the YOLOX-X checkpoint.
 
-The primary research demo is [Object Search and Approach](docs/object-search-and-approach.md).
+After `make sim`, you should see:
 
-## Where To Modify
+- Gazebo/Ignition loading the office world.
+- The Office Bot robot spawned near the start pose.
+- RViz showing the robot, lidar data, map, and Nav2 views.
+- Nav2 lifecycle nodes becoming active after the map and transforms settle.
+
+After `make detector`, you should see:
+
+- Detector logs streaming in your terminal.
+- The object search console at `http://localhost:8080/`.
+- Confirmed object cards once detections are stable.
+
+## Common Commands
+
+```bash
+make help           # Show simulation commands
+make start          # Build and run the browser preview container
+make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
+make detector       # Start/restart object detection and stream logs
+make detector-bg    # Start/restart detection without following logs
+make detector-logs  # Follow detector logs
+make detector-stop  # Stop the detector process
+make shell          # Open a ROS-ready shell in the container
+make urls           # Print browser URLs
+make restart        # Rebuild/recreate the preview container
+make down           # Stop and remove the preview container
+```
+
+## Troubleshooting
+
+- If `make start` cannot connect to Podman, run `podman machine start` and retry.
+- If ports are already in use, override them, for example `OPENHRI_NOVNC_PORT=6081 OPENHRI_OBJECT_UI_PORT=8081 make start`.
+- If Gazebo reports `Unable to find uri[model://...]`, rebuild the container with `make restart`; the simulation launch also sets the model path at runtime.
+- If the detector cannot find the YOLOX checkpoint, run `make checkpoint`.
+- If the UI shows no objects, keep Gazebo and the detector running, confirm `/camera/image_raw` is publishing, and place a COCO-class object in view.
+
+More detail is in [docs/troubleshooting.md](docs/troubleshooting.md).
+
+## Project Layout
 
 ```text
 dev_ws/
   launch_sim.sh
   src/
-    office_bot_model/                 Robot model, world, launch, Nav2, RViz
+    office_bot_model/                 Robot model, office world, launch, Nav2, RViz
     office_bot_controller_handlers/   Controller helper nodes
-    object_detector/                  Perception, tracking, navigation, web UI
-docs/
-  quickstart.md                       Main simulation run path
-  object-search-and-approach.md       Research task walkthrough
-  logging-spec.md                     Trial event logging shape
+    object_detector/                  Detection, localization, tracking, web UI
+container/                            Desktop, detector, checkpoint, and shell scripts
+docs/                                 Quickstart, task guide, study notes, troubleshooting
 ```
 
-Common object-search tuning points live in:
+Common object-search tuning points:
 
 - `dev_ws/src/object_detector/config/object_detector.yaml`
 - `dev_ws/src/object_detector/object_detector/localization.py`
@@ -67,29 +131,18 @@ Common object-search tuning points live in:
 - `dev_ws/src/object_detector/object_detector/navigation.py`
 - `dev_ws/src/object_detector/web/index.html`
 
-## Useful Commands
+## Documentation
 
-```bash
-make help           # Show available simulation commands
-make start          # Build and run the browser preview
-make sim            # Launch the office simulation in the container
-make detector       # Start/restart detection and stream logs
-make detector-bg    # Start/restart detection without following logs
-make detector-logs  # Follow existing object detector logs
-make shell          # Open a ROS-ready shell in the container
-make detector-stop  # Stop the background detector
-make down           # Stop and remove the preview container
-```
-
-Apple Silicon macOS defaults to `linux/arm64`. Intel Linux and Windows users can run:
-
-```bash
-OPENHRI_PLATFORM=linux/amd64 make start
-```
+- [Quickstart](docs/quickstart.md): shortest path to a working demo.
+- [Container quickstart](docs/container-quickstart.md): image, ports, platform, and operations notes.
+- [Object Search and Approach](docs/object-search-and-approach.md): the primary research task.
+- [Troubleshooting](docs/troubleshooting.md): common setup and runtime problems.
+- [Demo script](docs/demo-script.md): suggested 60 to 90 second demo structure.
+- [Study ideas](docs/study-ideas): HRI study directions built on the same task.
 
 ## Native ROS 2 Workflow
 
-Use the container path above for handoff and review. For native Ubuntu 22.04 / ROS 2 Humble development:
+The container path is the recommended handoff path. For native Ubuntu 22.04 / ROS 2 Humble development:
 
 ```bash
 cd dev_ws
@@ -106,12 +159,6 @@ colcon build --symlink-install --packages-select office_bot_model
 colcon build --symlink-install --packages-select office_bot_controller_handlers
 colcon build --symlink-install --packages-select object_detector
 ```
-
-## More Docs
-
-- [Container quickstart](docs/container-quickstart.md)
-- [Demo script](docs/demo-script.md)
-- [Study ideas](docs/study-ideas)
 
 ## License
 

@@ -28,6 +28,17 @@ export OPENHRI_PLATFORM
 
 help:
 	@printf '%s\n' 'OpenHRI Office simulation workflow:'
+	@printf '%s\n' ''
+	@printf '%s\n' 'First run:'
+	@printf '  %-18s %s\n' 'make start' 'Build/start the preview container'
+	@printf '  %-18s %s\n' 'make sim' 'Launch Gazebo, RViz, SLAM, Nav2, and the robot'
+	@printf '  %-18s %s\n' 'make detector' 'Start object detection and stream logs'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Browser URLs:'
+	@printf '  %-18s %s\n' 'noVNC' 'http://localhost:6080/vnc.html?autoconnect=1&resize=remote'
+	@printf '  %-18s %s\n' 'Object UI' 'http://localhost:8080/'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Commands:'
 	@printf '  %-18s %s\n' 'make start' 'Build and run the browser preview'
 	@printf '  %-18s %s\n' 'make sim' 'Launch the office simulation in the container'
 	@printf '  %-18s %s\n' 'make detector' 'Start/restart detection and stream logs'

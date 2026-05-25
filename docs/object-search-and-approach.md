@@ -1,29 +1,107 @@
-# Object Search and Approach
+# Object Search And Approach
 
 Object Search and Approach is the primary OpenHRI Office research task. It demonstrates a complete HRI-relevant robot loop: detect an everyday object, localize it in the world, expose the robot's belief state to a human, and navigate to a useful stand-off pose.
 
-## Research Value
+## Demo Goal
 
-This task gives researchers a concrete base for studying:
+Show that a researcher can run a repeatable office scenario where a mobile robot:
 
-- Human-guided object search.
-- Trust in robot perception and remembered object locations.
-- Transparency of robot state during perception and navigation.
-- Operator decision-making in shared-autonomy workflows.
-- Service-robot approach behavior in office environments.
+1. Sees an object.
+2. Estimates where that object is in the map.
+3. Remembers the object as a track.
+4. Shows the track to a human operator.
+5. Accepts a navigation request.
+6. Approaches the object and stops at a safe offset.
+
+## Run The Task
+
+Start the preview container:
+
+```bash
+make start
+```
+
+Launch the simulation:
+
+```bash
+make sim
+```
+
+Start object detection in another terminal:
+
+```bash
+make detector
+```
+
+Open the object search console:
+
+```text
+http://localhost:8080/
+```
+
+## What To Watch
+
+In Gazebo:
+
+- The robot in the office world.
+- Obstacles and furniture around the robot.
+- Robot movement after a navigation request.
+
+In RViz:
+
+- `/map`
+- `/tf` and `/tf_static`
+- robot pose and odometry
+- lidar scans and point clouds
+- object markers
+- Nav2 global and local plans
+
+In the object search console:
+
+- connection state
+- confirmed object tracks
+- class name and track id
+- confidence and detection count
+- map coordinates
+- active navigation target
 
 ## System Behavior
 
 1. Camera images arrive on `/camera/image_raw`.
-2. YOLOX-X detects target objects.
-3. Lidar data is fused with the detection box.
+2. YOLOX-X detects COCO object classes.
+3. The detection box is fused with lidar/camera geometry.
 4. The object is localized in the map frame.
-5. A confirmed object track is created.
-6. Markers and obstacle clouds are published.
+5. A confirmed object track is created after repeated observations.
+6. Markers and object obstacle clouds are published.
 7. The web UI exposes object class, track id, location, and robot status.
 8. A researcher or operator requests navigation to the tracked object.
 9. Nav2 evaluates reachable approach options.
 10. The robot navigates to a stand-off pose and stops.
+
+## Useful ROS Topics
+
+```text
+/clock
+/camera/image_raw
+/camera/camera_info
+/lidar
+/lidar/points
+/detected_objects_markers
+/detected_object_obstacles
+/cmd_vel_stamped
+/map
+/tf
+/tf_static
+```
+
+Quick checks from `make shell`:
+
+```bash
+ros2 topic list
+ros2 topic echo /camera/image_raw --once --field header
+ros2 topic echo /detected_objects_markers --once
+ros2 topic echo /detected_object_obstacles --once
+```
 
 ## What Researchers Can Modify
 
@@ -35,37 +113,17 @@ This task gives researchers a concrete base for studying:
 - Dynamic replanning behavior.
 - UI wording and status presentation.
 - Object placement and robot start pose.
+- Trial outcome labels and event logging.
 
-## Simulation Workflow
-
-Start the preview:
-
-```bash
-make start
-```
-
-Launch the detector:
-
-```bash
-make detector
-```
-
-Open:
+Common tuning files:
 
 ```text
-http://localhost:8080/
+dev_ws/src/object_detector/config/object_detector.yaml
+dev_ws/src/object_detector/object_detector/localization.py
+dev_ws/src/object_detector/object_detector/tracking.py
+dev_ws/src/object_detector/object_detector/navigation.py
+dev_ws/src/object_detector/web/index.html
 ```
-
-Useful ROS topics:
-
-- `/clock`
-- `/camera/image_raw`
-- `/camera/camera_info`
-- `/lidar`
-- `/lidar/points`
-- `/detected_objects_markers`
-- `/detected_object_obstacles`
-- `/cmd_vel_stamped`
 
 ## Trial Template
 

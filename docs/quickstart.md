@@ -1,14 +1,26 @@
 # Quickstart
 
-This is the shortest handoff path for OpenHRI Office. It runs the containerized ROS 2 preview, opens the noVNC desktop, starts object detection, and exposes the object search console.
+This guide takes you from a clean checkout to a running OpenHRI Office simulation with object detection and the object search console.
 
-## 1. Start The Preview
+Use the commands from the repository root unless a step says otherwise.
 
-From the repository root:
+## 1. Start Podman
+
+On macOS, start the Podman virtual machine first:
+
+```bash
+podman machine start
+```
+
+Linux users usually do not need this step.
+
+## 2. Build And Start The Preview Container
 
 ```bash
 make start
 ```
+
+This builds the image when needed, starts the container in the background, and prints the browser URLs.
 
 Open the noVNC desktop:
 
@@ -16,72 +28,131 @@ Open the noVNC desktop:
 http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 ```
 
-On macOS, start the Podman machine first if Podman is not already running:
+Expected result:
 
-```bash
-podman machine start
-```
+- A browser-based Linux desktop opens.
+- Desktop launchers are available for OpenHRI Office and the object UI.
+- `make ps` shows the `openhri-office` container running.
 
-## 2. Launch The Office Simulation
+## 3. Launch The Office Simulation
 
-Use either path:
+In a terminal on your host machine:
 
 ```bash
 make sim
 ```
 
-Or, inside the noVNC desktop, open the **OpenHRI Office** launcher.
+Leave this command running. It starts Gazebo, spawns the robot, opens RViz, starts SLAM, activates Nav2, and bridges the camera/lidar topics into ROS 2.
 
-The desktop should show the office world, the reference robot, and RViz.
+Expected result:
 
-## 3. Start Object Detection
+- Gazebo loads the office environment.
+- RViz opens in the noVNC desktop.
+- The robot appears in both Gazebo and RViz.
+- Logs eventually show Nav2 managed nodes becoming active.
 
-From the repository root:
+You can also launch the same simulation from the noVNC desktop by opening **OpenHRI Office**.
+
+## 4. Start Object Detection
+
+Open a second host terminal and run:
 
 ```bash
 make detector
 ```
 
-The command starts the detector in the background and immediately streams its logs. Press `Ctrl-C` to stop following logs; use `make detector-stop` when you want to stop the detector process.
+This starts the detector in the background and streams logs in the terminal.
 
-Open the object search console:
+Press `Ctrl-C` when you want to stop following logs. The detector keeps running. Stop it explicitly with:
+
+```bash
+make detector-stop
+```
+
+## 5. Open The Object Search Console
+
+Open:
 
 ```text
 http://localhost:8080/
 ```
 
-The console shows confirmed object tracks, confidence, map coordinates, navigation requests, and robot status.
+Expected result:
 
-## 4. Run The Demo Task
+- The console shows connection and navigation status.
+- Confirmed object tracks appear after stable detections.
+- Each object card shows class, track id, confidence, detections, and map coordinates.
+- The **Navigate** button sends Nav2 to an approach pose near the selected object.
 
-Follow [Object Search and Approach](object-search-and-approach.md):
+## 6. Run The Demo Task
 
-1. Place or identify a target object in the office scene.
-2. Wait for a confirmed track in the object search console.
-3. Check the class, confidence, detections, and coordinates.
-4. Select **Navigate** for the target track.
-5. Observe Nav2 and RViz while the robot approaches a stand-off pose.
+Use [Object Search and Approach](object-search-and-approach.md) as the demo script:
 
-## Common Commands
+1. Start the simulation with `make sim`.
+2. Start detection with `make detector`.
+3. Put a recognizable object in the robot camera view, or navigate the camera view toward an existing object.
+4. Wait for a confirmed object card in the web console.
+5. Check the class, confidence, detections, and coordinates.
+6. Select **Navigate** for the target track.
+7. Watch RViz and Gazebo while the robot approaches the stand-off pose.
+
+## Useful Checks
+
+Open a ROS-ready shell in the container:
 
 ```bash
-make help           # Show all preview commands
-make start          # Build and run the noVNC preview
-make sim            # Launch the office simulation
-make detector       # Start/restart detection and stream logs
-make detector-bg    # Start/restart detection without following logs
-make detector-logs  # Follow existing object detector logs
-make detector-stop  # Stop the background detector
-make urls           # Print noVNC and object console URLs
-make down           # Stop and remove the preview container
+make shell
+```
+
+Inside the container:
+
+```bash
+ros2 topic list
+ros2 topic echo /camera/image_raw --once --field header
+ros2 topic echo /lidar --once --field header
+ros2 topic echo /detected_objects_markers --once
+```
+
+Follow detector logs:
+
+```bash
+make detector-logs
+```
+
+Print browser URLs:
+
+```bash
+make urls
+```
+
+## Stop And Reset
+
+Stop the detector:
+
+```bash
+make detector-stop
+```
+
+Stop and remove the preview container:
+
+```bash
+make down
+```
+
+Rebuild and recreate the container:
+
+```bash
+make restart
 ```
 
 ## Platform Notes
 
-Apple Silicon macOS uses `linux/arm64` by default. Intel Linux and Intel Windows users can run:
+Apple Silicon macOS uses `linux/arm64` by default.
+
+Intel Linux and Intel Windows users can run:
 
 ```bash
 OPENHRI_PLATFORM=linux/amd64 make start
 ```
 
-The full container notes are in [container-quickstart.md](container-quickstart.md). Native ROS 2 development is documented in the repository README.
+For container details, ports, image tags, and troubleshooting, see [container-quickstart.md](container-quickstart.md) and [troubleshooting.md](troubleshooting.md).
