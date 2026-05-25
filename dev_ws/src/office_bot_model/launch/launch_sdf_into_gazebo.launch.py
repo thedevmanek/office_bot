@@ -198,7 +198,6 @@ def generate_launch_description():
         ],
     )
 
-
     def start_after_spawn():
         return [
             robot_localization_node,

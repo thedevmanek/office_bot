@@ -6,6 +6,12 @@ import numpy as np
 from object_detector.datatypes import DetectionBox
 
 
+YOLOX_CHECKPOINTS = {
+    "yolox-m": "resource/yolox_m.pth",
+    "yolox-x": "resource/yolox_x.pth",
+}
+
+
 def package_resource_path(package_name, relative_path, override=""):
     from ament_index_python.packages import get_package_share_directory
 
@@ -46,18 +52,17 @@ class ObjectDetectorModel:
         class_names_path,
         confidence_threshold,
         min_bbox_area_ratio,
-        model_name="yolox-m",
+        model_name="yolox-x",
         logger=None,
     ):
-        self.ckpt_path = package_resource_path(
-            "object_detector", "resource/yolox_m.pth", ckpt_path
-        )
+        self.model_name = model_name
+        checkpoint_resource = YOLOX_CHECKPOINTS.get(model_name, "resource/yolox_x.pth")
+        self.ckpt_path = package_resource_path("object_detector", checkpoint_resource, ckpt_path)
         self.class_names_path = package_resource_path(
             "object_detector", "resource/coco.names", class_names_path
         )
         self.confidence_threshold = confidence_threshold
         self.min_bbox_area_ratio = min_bbox_area_ratio
-        self.model_name = model_name
         self.logger = logger
         self.classes = []
         self.test_size = (640, 640)
@@ -67,15 +72,15 @@ class ObjectDetectorModel:
         self.status_message = "Waiting for detections."
 
     def load(self):
-        import torch
-        from yolox.exp import get_exp
-
         self.classes = self._load_classes()
 
         if not self.ckpt_path.exists():
             self.status_message = f"YOLO checkpoint not found: {self.ckpt_path}"
             self._log("error", self.status_message)
             return False
+
+        import torch
+        from yolox.exp import get_exp
 
         exp = get_exp(None, self.model_name)
         self.model = exp.get_model()
@@ -91,11 +96,12 @@ class ObjectDetectorModel:
         self.model.to(self.device)
         self.test_size = exp.test_size
         self.ready = True
+        model_label = self.model_name.upper()
         if self.device == "cuda":
             gpu_name = torch.cuda.get_device_name(0)
-            self.status_message = f"YOLOX-M active on CUDA: {gpu_name}."
+            self.status_message = f"{model_label} active on CUDA: {gpu_name}."
         else:
-            self.status_message = "YOLOX-M active on CPU."
+            self.status_message = f"{model_label} active on CPU."
         self._log("info", self.status_message)
         return True
 

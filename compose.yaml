@@ -1,0 +1,23 @@
+name: openhri-office
+
+services:
+  openhri-office:
+    image: ${OPENHRI_IMAGE:-openhri-office:0.1.0-preview}
+    container_name: ${OPENHRI_CONTAINER_NAME:-openhri-office}
+    platform: ${OPENHRI_PLATFORM:-linux/arm64}
+    build:
+      context: .
+      dockerfile: ${OPENHRI_CONTAINERFILE:-Containerfile}
+      platforms:
+        - ${OPENHRI_PLATFORM:-linux/arm64}
+    shm_size: 2gb
+    ports:
+      - "${OPENHRI_NOVNC_PORT:-6080}:6080"
+      - "${OPENHRI_VNC_PORT:-5900}:5900"
+      - "${OPENHRI_OBJECT_UI_PORT:-8080}:8080"
+    environment:
+      VNC_GEOMETRY: ${OPENHRI_VNC_GEOMETRY:-1600x900}
+      LIBGL_ALWAYS_SOFTWARE: "1"
+      MESA_GL_VERSION_OVERRIDE: "3.3"
+      QT_X11_NO_MITSHM: "1"
+    restart: "no"

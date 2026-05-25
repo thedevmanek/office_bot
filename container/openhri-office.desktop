@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=OpenHRI Office
+Comment=Launch the OpenHRI Office simulation scenario
+Exec=xfce4-terminal --hold --title "OpenHRI Office" --command "/usr/local/bin/start-openhri.sh"
+Terminal=false
+Categories=Robotics;

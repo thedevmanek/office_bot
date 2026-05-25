@@ -11,7 +11,7 @@ from yolox.data.data_augment import ValTransform
 from yolox.exp import get_exp
 from yolox.utils import postprocess
 
-CKPT_PATH = Path(__file__).resolve().parents[1] / "resource" / "yolox_m.pth"
+CKPT_PATH = Path(__file__).resolve().parents[1] / "resource" / "yolox_x.pth"
 CAM_INDEX = 2
 
 COCO_CLASSES = (
@@ -33,7 +33,7 @@ COCO_CLASSES = (
 
 def main():
     """Run YOLOX against a local V4L2 camera for manual debugging."""
-    exp = get_exp(exp_name="yolox-m")
+    exp = get_exp(exp_name="yolox-x")
     model = exp.get_model()
     model.eval()
 

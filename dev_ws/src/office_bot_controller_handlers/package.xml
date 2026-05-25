@@ -6,7 +6,7 @@
   <description>This package contains handlers for all the required controllers with easy to use
     functions</description>
   <maintainer email="thedevmanek@gmail.com">thedevmanek</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
 
   <!-- Dependencies -->
