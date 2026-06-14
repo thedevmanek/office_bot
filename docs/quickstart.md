@@ -14,13 +14,14 @@ podman machine start
 
 Linux users usually do not need this step.
 
-## 2. Build And Start The Preview Container
+## 2. Pull And Start The Preview Container
 
 ```bash
+make doctor
 make start
 ```
 
-This builds the image when needed, starts the container in the background, and prints the browser URLs.
+`make doctor` runs read-only preflight checks. `make start` pulls the published GitHub Container Registry runtime image, starts the container, mounts this checkout read-only, builds the mounted ROS workspace into named Podman volumes, and prints the browser URLs. It does not build the image locally.
 
 Open the noVNC desktop:
 
@@ -139,7 +140,13 @@ Stop and remove the preview container:
 make down
 ```
 
-Rebuild and recreate the container:
+Build the local runtime image and recreate the container:
+
+```bash
+make restart-local
+```
+
+To recreate from the published runtime image instead, run:
 
 ```bash
 make restart

@@ -3,7 +3,7 @@ from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'object_detector'
-resource_files = glob('resource/coco.names') + glob('resource/*.pth')
+resource_files = glob('resource/coco.names')
 
 setup(
     name=package_name,

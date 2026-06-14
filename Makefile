@@ -1,5 +1,6 @@
-IMAGE ?= openhri-office:0.1.0-preview
+IMAGE ?= ghcr.io/thedevmanek/openhri-office:0.1.0-preview
 CONTAINER ?= openhri-office
+CONTAINERFILE ?= Containerfile
 NOVNC_URL ?= http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 OBJECT_UI_URL ?= http://localhost:8080
 DETECTOR_PARAMS ?= /workspace/openhri-office/dev_ws/src/object_detector/config/object_detector.yaml
@@ -24,22 +25,27 @@ export OPENHRI_IMAGE := $(IMAGE)
 export OPENHRI_CONTAINER_NAME := $(CONTAINER)
 export OPENHRI_PLATFORM
 
-.PHONY: help build up start stop down restart ps logs shell sim detector detector-bg detector-logs detector-stop checkpoint urls clean
+.PHONY: help doctor build up start start-cached start-local bootstrap stop down restart restart-local ps logs shell sim detector detector-bg detector-logs detector-stop checkpoint urls clean clean-volumes
 
 help:
 	@printf '%s\n' 'OpenHRI Office simulation workflow:'
 	@printf '%s\n' ''
 	@printf '%s\n' 'First run:'
-	@printf '  %-18s %s\n' 'make start' 'Build/start the preview container'
+	@printf '  %-18s %s\n' 'make doctor' 'Check Podman, platform, ports, and disk space'
+	@printf '  %-18s %s\n' 'make start' 'Pull runtime, mount source, and bootstrap workspace'
 	@printf '  %-18s %s\n' 'make sim' 'Launch Gazebo, RViz, SLAM, Nav2, and the robot'
 	@printf '  %-18s %s\n' 'make detector' 'Start object detection and stream logs'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Browser URLs:'
 	@printf '  %-18s %s\n' 'noVNC' 'http://localhost:6080/vnc.html?autoconnect=1&resize=remote'
-	@printf '  %-18s %s\n' 'Object UI' 'http://localhost:8080/'
+	@printf '  %-18s %s\n' 'Object UI' 'http://localhost:8080/ (after make detector)'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Commands:'
-	@printf '  %-18s %s\n' 'make start' 'Build and run the browser preview'
+	@printf '  %-18s %s\n' 'make doctor' 'Run read-only preflight checks'
+	@printf '  %-18s %s\n' 'make start' 'Pull runtime, mount source, and bootstrap workspace'
+	@printf '  %-18s %s\n' 'make start-cached' 'Run the cached image without pulling'
+	@printf '  %-18s %s\n' 'make start-local' 'Build runtime image locally and run it'
+	@printf '  %-18s %s\n' 'make bootstrap' 'Build the mounted ROS workspace'
 	@printf '  %-18s %s\n' 'make sim' 'Launch the office simulation in the container'
 	@printf '  %-18s %s\n' 'make detector' 'Start/restart detection and stream logs'
 	@printf '  %-18s %s\n' 'make detector-bg' 'Start/restart detection without following logs'
@@ -47,17 +53,37 @@ help:
 	@printf '  %-18s %s\n' 'make detector-stop' 'Stop the detector process'
 	@printf '  %-18s %s\n' 'make shell' 'Open a ROS-ready container shell'
 	@printf '  %-18s %s\n' 'make urls' 'Print browser URLs'
+	@printf '  %-18s %s\n' 'make restart' 'Pull and recreate the runtime preview'
+	@printf '  %-18s %s\n' 'make restart-local' 'Build runtime image locally and recreate preview'
 	@printf '  %-18s %s\n' 'make down' 'Stop and remove the preview container'
+	@printf '  %-18s %s\n' 'make clean-volumes' 'Remove cached build/install/log volumes'
+
+doctor:
+	scripts/doctor.sh
 
 build:
-	podman compose build
+	podman build --platform=$(OPENHRI_PLATFORM) --tag $(IMAGE) --file $(CONTAINERFILE) .
 
-up:
-	podman compose up --build
+up: start-cached
 
-start:
-	podman compose up --build -d
+start: doctor
+	podman pull --platform=$(OPENHRI_PLATFORM) $(IMAGE)
+	podman compose up -d
+	$(MAKE) bootstrap
 	$(MAKE) urls
+
+start-cached: doctor
+	podman compose up -d
+	$(MAKE) bootstrap
+	$(MAKE) urls
+
+start-local: doctor build
+	podman compose up -d
+	$(MAKE) bootstrap
+	$(MAKE) urls
+
+bootstrap:
+	podman exec $(CONTAINER) bash -lc 'openhri-bootstrap-workspace'
 
 stop:
 	podman compose stop
@@ -66,7 +92,17 @@ down:
 	podman compose down
 
 restart:
-	podman compose up --build -d --force-recreate
+	$(MAKE) doctor
+	podman pull --platform=$(OPENHRI_PLATFORM) $(IMAGE)
+	podman compose up -d --force-recreate
+	$(MAKE) bootstrap
+	$(MAKE) urls
+
+restart-local:
+	$(MAKE) doctor
+	$(MAKE) build
+	podman compose up -d --force-recreate
+	$(MAKE) bootstrap
 	$(MAKE) urls
 
 ps:
@@ -102,11 +138,14 @@ detector-stop:
 	@printf 'Object detector stopped.\n'
 
 checkpoint:
-	podman exec -it $(CONTAINER) bash -ic 'download-yolox-checkpoint.sh && colcon build --packages-select object_detector --symlink-install && source install/setup.bash'
+	podman exec -it $(CONTAINER) bash -ic 'download-yolox-checkpoint.sh'
 
 urls:
 	@printf 'noVNC:     %s\n' '$(NOVNC_URL)'
-	@printf 'Object UI: %s\n' '$(OBJECT_UI_URL)'
+	@printf 'Object UI: %s (after make detector)\n' '$(OBJECT_UI_URL)'
 
 clean:
 	podman compose down --remove-orphans
+
+clean-volumes:
+	podman compose down --volumes --remove-orphans

@@ -2,16 +2,17 @@
 set -euo pipefail
 
 OPENHRI_WS="${OPENHRI_WS:-/workspace/openhri-office/dev_ws}"
+CHECKPOINT_DIR="${OPENHRI_CHECKPOINT_DIR:-/opt/openhri/checkpoints}"
 MODEL_NAME="${OPENHRI_YOLOX_MODEL:-yolox-x}"
 
 case "${MODEL_NAME}" in
   yolox-x)
-    CHECKPOINT="${OPENHRI_YOLOX_CHECKPOINT_PATH:-${OPENHRI_WS}/src/object_detector/resource/yolox_x.pth}"
+    CHECKPOINT="${OPENHRI_YOLOX_CHECKPOINT_PATH:-${CHECKPOINT_DIR}/yolox_x.pth}"
     URL="${OPENHRI_YOLOX_CHECKPOINT_URL:-https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth}"
     EXPECTED_SHAPE="(80, 12, 3, 3)"
     ;;
   yolox-m)
-    CHECKPOINT="${OPENHRI_YOLOX_CHECKPOINT_PATH:-${OPENHRI_WS}/src/object_detector/resource/yolox_m.pth}"
+    CHECKPOINT="${OPENHRI_YOLOX_CHECKPOINT_PATH:-${CHECKPOINT_DIR}/yolox_m.pth}"
     URL="${OPENHRI_YOLOX_CHECKPOINT_URL:-https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_m.pth}"
     EXPECTED_SHAPE="(48, 12, 3, 3)"
     ;;

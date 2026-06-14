@@ -2,14 +2,10 @@ name: openhri-office
 
 services:
   openhri-office:
-    image: ${OPENHRI_IMAGE:-openhri-office:0.1.0-preview}
+    image: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:0.1.0-preview}
+    pull_policy: never
     container_name: ${OPENHRI_CONTAINER_NAME:-openhri-office}
     platform: ${OPENHRI_PLATFORM:-linux/arm64}
-    build:
-      context: .
-      dockerfile: ${OPENHRI_CONTAINERFILE:-Containerfile}
-      platforms:
-        - ${OPENHRI_PLATFORM:-linux/arm64}
     shm_size: 2gb
     ports:
       - "${OPENHRI_NOVNC_PORT:-6080}:6080"
@@ -20,4 +16,14 @@ services:
       LIBGL_ALWAYS_SOFTWARE: "1"
       MESA_GL_VERSION_OVERRIDE: "3.3"
       QT_X11_NO_MITSHM: "1"
+    volumes:
+      - .:/workspace/openhri-office:ro
+      - openhri-dev-build:/workspace/openhri-office/dev_ws/build
+      - openhri-dev-install:/workspace/openhri-office/dev_ws/install
+      - openhri-dev-log:/workspace/openhri-office/dev_ws/log
     restart: "no"
+
+volumes:
+  openhri-dev-build:
+  openhri-dev-install:
+  openhri-dev-log:

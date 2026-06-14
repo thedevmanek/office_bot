@@ -3,8 +3,7 @@ set -euo pipefail
 
 export OPENHRI_WS="${OPENHRI_WS:-/workspace/openhri-office/dev_ws}"
 
-source /opt/ros/humble/setup.bash
-source "${OPENHRI_WS}/install/local_setup.bash"
+source /etc/profile.d/openhri-container-env.sh
 
 cd "${OPENHRI_WS}"
 exec ros2 run object_detector detect --ros-args \

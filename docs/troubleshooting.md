@@ -2,6 +2,12 @@
 
 Use this guide when the preview does not start cleanly or the object search workflow does not produce tracks.
 
+Start with the read-only preflight checks:
+
+```bash
+make doctor
+```
+
 ## Podman Is Not Running
 
 Symptom:
@@ -53,18 +59,28 @@ Unable to find uri[model://toilet]
 Failed to load a world
 ```
 
-The simulation launch sets both Gazebo and Ignition resource paths at runtime. If you still see this after pulling changes, rebuild the container:
+The simulation launch sets both Gazebo and Ignition resource paths at runtime. If you still see this after pulling source changes, rebuild the mounted workspace:
+
+```bash
+make bootstrap
+```
+
+If the runtime image changed, recreate the container from the published image:
 
 ```bash
 make restart
 ```
 
+If you changed local container scripts or the `Containerfile`, rebuild the runtime image from this checkout instead:
+
+```bash
+make restart-local
+```
+
 For a running development container, rebuild the model package:
 
 ```bash
-make shell
-colcon build --symlink-install --packages-select office_bot_model
-source install/setup.bash
+make bootstrap
 ```
 
 Then rerun:
@@ -192,8 +208,15 @@ make sim
 make detector
 ```
 
-For a full rebuild:
+For a full local rebuild:
 
 ```bash
-make restart
+make restart-local
+```
+
+To clear cached ROS build artifacts stored in named Podman volumes:
+
+```bash
+make clean-volumes
+make start
 ```

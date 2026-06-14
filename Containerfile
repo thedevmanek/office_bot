@@ -11,6 +11,7 @@ ENV LIBGL_ALWAYS_SOFTWARE=1
 ENV MESA_GL_VERSION_OVERRIDE=3.3
 ENV QT_X11_NO_MITSHM=1
 ENV OPENHRI_YOLOX_MODEL=yolox-x
+ENV OPENHRI_CHECKPOINT_DIR=/opt/openhri/checkpoints
 ARG OPENHRI_DOWNLOAD_YOLOX_CHECKPOINT=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -67,13 +68,22 @@ RUN python3 -m pip install --no-cache-dir --index-url https://download.pytorch.o
     git+https://github.com/Megvii-BaseDetection/YOLOX.git@0.3.0
 
 WORKDIR /workspace/openhri-office
-COPY README.md ./README.md
-COPY docs ./docs
-COPY dev_ws ./dev_ws
+COPY container/download-yolox-checkpoint.sh /usr/local/bin/download-yolox-checkpoint.sh
+
+RUN chmod +x /usr/local/bin/download-yolox-checkpoint.sh
+
+RUN if [ "${OPENHRI_DOWNLOAD_YOLOX_CHECKPOINT}" = "1" ]; then \
+      /usr/local/bin/download-yolox-checkpoint.sh; \
+    else \
+      echo "Skipping YOLOX checkpoint download."; \
+    fi
+
+RUN bash -lc 'rosdep init 2>/dev/null || true && rosdep update'
+
 COPY container/start-desktop.sh /usr/local/bin/start-desktop.sh
 COPY container/start-openhri.sh /usr/local/bin/start-openhri.sh
 COPY container/start-object-detector.sh /usr/local/bin/start-object-detector.sh
-COPY container/download-yolox-checkpoint.sh /usr/local/bin/download-yolox-checkpoint.sh
+COPY container/openhri-bootstrap-workspace.sh /usr/local/bin/openhri-bootstrap-workspace
 COPY container/openhri-container-env.sh /etc/profile.d/openhri-container-env.sh
 COPY container/supervisord.conf /etc/supervisor/conf.d/openhri.conf
 
@@ -84,7 +94,7 @@ COPY container/openhri-object-ui.desktop /root/Desktop/OpenHRI-Object-UI.desktop
 RUN chmod +x /usr/local/bin/start-desktop.sh \
     /usr/local/bin/start-openhri.sh \
     /usr/local/bin/start-object-detector.sh \
-    /usr/local/bin/download-yolox-checkpoint.sh \
+    /usr/local/bin/openhri-bootstrap-workspace \
     /etc/profile.d/openhri-container-env.sh \
     /root/Desktop/OpenHRI-Office.desktop \
     /root/Desktop/OpenHRI-Object-UI.desktop
@@ -92,19 +102,6 @@ RUN chmod +x /usr/local/bin/start-desktop.sh \
 RUN grep -qxF 'source /etc/profile.d/openhri-container-env.sh' /root/.bashrc \
     || echo 'source /etc/profile.d/openhri-container-env.sh' >> /root/.bashrc \
   && echo 'source /etc/profile.d/openhri-container-env.sh' > /root/.zshrc
-
-RUN if [[ "${OPENHRI_DOWNLOAD_YOLOX_CHECKPOINT}" == "1" ]]; then \
-      /usr/local/bin/download-yolox-checkpoint.sh; \
-    else \
-      echo "Skipping YOLOX checkpoint download."; \
-    fi
-
-RUN bash -lc 'rosdep init 2>/dev/null || true \
-  && rosdep update \
-  && source /opt/ros/humble/setup.bash \
-  && cd "${OPENHRI_WS}" \
-  && rosdep install --from-paths src --ignore-src -r -y \
-  && colcon build --symlink-install'
 
 EXPOSE 6080 5900 8080
 CMD ["/usr/local/bin/start-desktop.sh"]

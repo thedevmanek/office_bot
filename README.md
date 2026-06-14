@@ -19,7 +19,7 @@ This is the simulation branch. Raspberry Pi hardware bringup lives on the `hardw
 ## Prerequisites
 
 - Podman with Compose support.
-- 8 GB or more free disk space for the image and model checkpoint.
+- 8 GB or more free disk space for the published image and runtime data.
 - A machine with enough memory for Gazebo, RViz, Nav2, and PyTorch CPU inference.
 - On macOS, a running Podman machine:
 
@@ -33,11 +33,18 @@ Apple Silicon macOS defaults to `linux/arm64`. Intel Linux and Windows users can
 OPENHRI_PLATFORM=linux/amd64
 ```
 
+The supported runtime is Podman. The runtime image is published on GitHub Container Registry as:
+
+```text
+ghcr.io/thedevmanek/openhri-office:0.1.0-preview
+```
+
 ## Quickstart
 
 From the repository root:
 
 ```bash
+make doctor
 make start
 ```
 
@@ -69,7 +76,9 @@ For a step-by-step walkthrough, use [docs/quickstart.md](docs/quickstart.md).
 
 ## Expected First Run
 
-The first `make start` can take a while because it builds the ROS image, installs dependencies, installs YOLOX, and downloads the YOLOX-X checkpoint.
+The first `make start` runs read-only preflight checks, pulls `ghcr.io/thedevmanek/openhri-office:0.1.0-preview`, starts the container, mounts this checkout read-only, builds the mounted ROS workspace into named Podman volumes, and prints browser URLs. It does not build the image locally. Use `make start-local` when you intentionally want to build the runtime image from this checkout.
+
+The runtime image contains ROS, Gazebo, RViz, Nav2, PyTorch, YOLOX, noVNC, startup scripts, and the YOLOX checkpoint. The repository checkout provides the ROS packages, launch files, world assets, object detector code, web UI, docs, and configs at runtime.
 
 After `make sim`, you should see:
 
@@ -88,7 +97,11 @@ After `make detector`, you should see:
 
 ```bash
 make help           # Show simulation commands
-make start          # Build and run the browser preview container
+make doctor         # Check Podman, platform, ports, and disk space
+make start          # Pull runtime, mount source, and bootstrap workspace
+make start-cached   # Run the cached image without pulling
+make start-local    # Build the runtime image locally and run it
+make bootstrap      # Rebuild the mounted ROS workspace
 make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
 make detector       # Start/restart object detection and stream logs
 make detector-bg    # Start/restart detection without following logs
@@ -96,15 +109,19 @@ make detector-logs  # Follow detector logs
 make detector-stop  # Stop the detector process
 make shell          # Open a ROS-ready shell in the container
 make urls           # Print browser URLs
-make restart        # Rebuild/recreate the preview container
+make restart        # Pull and recreate the runtime preview container
+make restart-local  # Build the runtime image locally and recreate the preview
 make down           # Stop and remove the preview container
+make clean-volumes  # Remove cached build/install/log volumes
 ```
 
 ## Troubleshooting
 
-- If `make start` cannot connect to Podman, run `podman machine start` and retry.
+- Run `make doctor` for read-only preflight checks and exact fix commands.
+- If `make start` cannot connect to Podman on macOS, run `podman machine start` and retry.
 - If ports are already in use, override them, for example `OPENHRI_NOVNC_PORT=6081 OPENHRI_OBJECT_UI_PORT=8081 make start`.
-- If Gazebo reports `Unable to find uri[model://...]`, rebuild the container with `make restart`; the simulation launch also sets the model path at runtime.
+- If Gazebo reports `Unable to find uri[model://...]`, recreate the container with `make restart`; the simulation launch also sets the model path at runtime.
+- If you changed source under `dev_ws/`, run `make bootstrap` before launching again.
 - If the detector cannot find the YOLOX checkpoint, run `make checkpoint`.
 - If the UI shows no objects, keep Gazebo and the detector running, confirm `/camera/image_raw` is publishing, and place a COCO-class object in view.
 
@@ -135,6 +152,7 @@ Common object-search tuning points:
 
 - [Quickstart](docs/quickstart.md): shortest path to a working demo.
 - [Container quickstart](docs/container-quickstart.md): image, ports, platform, and operations notes.
+- [Runtime image release](docs/runtime-image-release.md): GHCR publishing and tag policy.
 - [Object Search and Approach](docs/object-search-and-approach.md): the primary research task.
 - [Troubleshooting](docs/troubleshooting.md): common setup and runtime problems.
 - [Demo script](docs/demo-script.md): suggested 60 to 90 second demo structure.

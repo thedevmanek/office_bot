@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import cv2
@@ -25,9 +26,18 @@ def package_resource_path(package_name, relative_path, override=""):
         pass
 
     candidates.append(Path(__file__).resolve().parents[1] / relative_path)
+    checkpoint_path = None
+    if relative_path.startswith("resource/yolox_") and relative_path.endswith(".pth"):
+        checkpoint_path = (
+            Path(os.environ.get("OPENHRI_CHECKPOINT_DIR", "/opt/openhri/checkpoints"))
+            / Path(relative_path).name
+        )
+        candidates.append(checkpoint_path)
     for path in candidates:
         if path.exists():
             return path
+    if checkpoint_path is not None:
+        return checkpoint_path
     return candidates[0] if candidates else Path(relative_path)
 
 
