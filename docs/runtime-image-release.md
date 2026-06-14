@@ -41,6 +41,8 @@ The workflow publishes `latest-preview` on pushes to `main` when runtime-image i
 - `container/**`
 - `.github/workflows/publish-runtime-image.yml`
 
+Pull requests into `main` run the same multi-architecture image build for validation, but they do not push an image to GHCR. PR builds also populate the Buildx cache so the later `main` publish run can reuse layers when the merge commit has the same runtime inputs.
+
 The workflow also runs for tags matching `v*`. A tag such as:
 
 ```text
