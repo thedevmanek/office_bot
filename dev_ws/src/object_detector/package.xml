@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="thedevmanek@gmail.com">thedevmanek</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
 
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>cv_bridge</exec_depend>

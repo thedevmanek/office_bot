@@ -55,6 +55,7 @@ class ObjectDetectionNode(Node):
             self.params["class_names_path"],
             self.params["confidence_threshold"],
             self.params["min_bbox_area_ratio"],
+            self.params["model_name"],
             logger=self.get_logger(),
         )
 
@@ -115,13 +116,14 @@ class ObjectDetectionNode(Node):
             "camera_forward_axis": "z",
             "ray_projection_depth_m": 10.0,
             "lidar_bearing_offset_deg": 0.0,
-            "web_host": "127.0.0.1",
+            "web_host": "0.0.0.0",
             "web_port": 8080,
             "lidar_frame": "lidar_link",
             "map_frame": "map",
             "base_frame": "base_footprint",
             "ckpt_path": "",
             "class_names_path": "",
+            "model_name": "yolox-x",
         }
         return {
             name: self.declare_parameter(name, default).value

@@ -22,13 +22,13 @@ class ObjectHuntWebServer:
         except OSError as exc:
             self._log(
                 "error",
-                f"Could not start Object Hunt Web UI on {self.host}:{self.port}: {exc}",
+                f"Could not start Object Search Web UI on {self.host}:{self.port}: {exc}",
             )
             return None
 
         thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         thread.start()
-        self._log("info", f"Object Hunt Web UI: http://{self.host}:{self.port}/")
+        self._log("info", f"Object Search Web UI: http://{self.host}:{self.port}/")
         return self
 
     def shutdown(self):
@@ -137,4 +137,4 @@ def load_web_index():
     for path in candidates:
         if path.exists():
             return path.read_text(encoding="utf-8")
-    return "<!doctype html><title>Object Hunt</title><p>Web UI asset not found.</p>"
+    return "<!doctype html><title>Object Search</title><p>Web UI asset not found.</p>"

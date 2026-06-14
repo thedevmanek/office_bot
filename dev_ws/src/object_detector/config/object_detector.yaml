@@ -46,10 +46,11 @@ object_detection_node:
     camera_forward_axis: z
     ray_projection_depth_m: 10.0
     lidar_bearing_offset_deg: 0.0
-    web_host: 127.0.0.1
+    web_host: 0.0.0.0
     web_port: 8080
     lidar_frame: lidar_link
     map_frame: map
     base_frame: base_footprint
     ckpt_path: ""
     class_names_path: ""
+    model_name: yolox-x

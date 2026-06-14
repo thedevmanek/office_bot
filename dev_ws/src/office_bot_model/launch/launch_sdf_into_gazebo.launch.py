@@ -15,6 +15,16 @@ from nav2_common.launch import ReplaceString
 import xacro
 
 
+def _prepend_path_env(name, path):
+    existing = os.environ.get(name, "")
+    if path in existing.split(os.pathsep):
+        return existing
+    entries = [path]
+    if existing:
+        entries.append(existing)
+    return os.pathsep.join(entries)
+
+
 def _expanded_robot_description(package_share, mesh_uri_prefix, controller_config_path):
     robot_description_path = os.path.join(
         package_share, "models", "officebot_xacro", "main.xacro"
@@ -60,6 +70,9 @@ def generate_launch_description():
     world_description_path = os.path.join(
         package_share, "models", "worlds", "office_world", "service.world"
     )
+    world_models_path = os.path.join(
+        package_share, "models", "worlds", "office_world", "models"
+    )
     robot_description, configured_robot_path = _configured_robot_description(
         package_share
     )
@@ -78,6 +91,20 @@ def generate_launch_description():
             "-r",
             world_description_path,
         ],
+        additional_env={
+            "GZ_SIM_RESOURCE_PATH": _prepend_path_env(
+                "GZ_SIM_RESOURCE_PATH", world_models_path
+            ),
+            "IGN_GAZEBO_RESOURCE_PATH": _prepend_path_env(
+                "IGN_GAZEBO_RESOURCE_PATH", world_models_path
+            ),
+            "GZ_SIM_SYSTEM_PLUGIN_PATH": _prepend_path_env(
+                "GZ_SIM_SYSTEM_PLUGIN_PATH", "/opt/ros/humble/lib"
+            ),
+            "IGN_GAZEBO_SYSTEM_PLUGIN_PATH": _prepend_path_env(
+                "IGN_GAZEBO_SYSTEM_PLUGIN_PATH", "/opt/ros/humble/lib"
+            ),
+        },
         output="screen",
     )
 
@@ -197,7 +224,6 @@ def generate_launch_description():
             }
         ],
     )
-
 
     def start_after_spawn():
         return [

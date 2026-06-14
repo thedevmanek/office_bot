@@ -425,7 +425,8 @@ class ObjectNavigator:
             self.set_status(
                 "error",
                 f"{track['class_name']} #{track['track_id']} is close in the map, "
-                "but lidar cannot see the object surface. It is likely behind an obstacle or wall.",
+                "but lidar cannot see the object surface. It is likely behind an "
+                "obstacle or wall.",
                 track["track_id"],
             )
             return

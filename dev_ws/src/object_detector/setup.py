@@ -3,7 +3,7 @@ from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'object_detector'
-resource_files = glob('resource/coco.names') + glob('resource/*.pth')
+resource_files = glob('resource/coco.names')
 
 setup(
     name=package_name,
@@ -20,8 +20,8 @@ setup(
     zip_safe=True,
     maintainer='thedevmanek',
     maintainer_email='thedevmanek@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='OpenHRI object detection, localization, tracking, and navigation UI',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',

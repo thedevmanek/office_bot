@@ -3,21 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Office Bot Object Hunt</title>
+    <title>OpenHRI Object Search</title>
     <style>
       :root {
         color-scheme: light;
-        --bg: #f5f7f8;
+        --bg: #f4f6f5;
         --panel: #ffffff;
-        --ink: #18201f;
-        --muted: #63706d;
-        --line: #cfd8d5;
-        --soft: #eef3f1;
+        --panel-muted: #f8faf9;
+        --ink: #16201e;
+        --muted: #5e6b68;
+        --quiet: #7a8582;
+        --line: #d7dfdc;
+        --line-strong: #b9c6c2;
         --accent: #126b4a;
-        --accent-strong: #0d5238;
-        --active: #dcebe5;
-        --warning: #946100;
-        --error: #a32121;
+        --accent-strong: #0b5137;
+        --accent-soft: #e5f1ed;
+        --blue: #245f8f;
+        --blue-soft: #e8f1f8;
+        --warning: #8a5a00;
+        --warning-soft: #fff3d8;
+        --error: #a02b2b;
+        --error-soft: #fae8e8;
+        --shadow: 0 14px 36px rgba(23, 34, 31, 0.08);
       }
 
       * {
@@ -27,144 +34,295 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background: var(--bg);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 246, 245, 0)),
+          var(--bg);
         color: var(--ink);
-        font-family: "Aptos", "Segoe UI", sans-serif;
+        font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
       }
 
-      main {
-        width: min(1080px, calc(100vw - 32px));
+      button,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 760;
+        min-height: 40px;
+        padding: 0 14px;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.56;
+      }
+
+      button.primary {
+        background: var(--accent);
+        color: #ffffff;
+      }
+
+      button.primary:hover:not(:disabled) {
+        background: var(--accent-strong);
+      }
+
+      button.secondary {
+        background: var(--panel);
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      button.secondary:hover:not(:disabled) {
+        border-color: var(--line-strong);
+      }
+
+      button.danger {
+        background: var(--panel);
+        border-color: #e3b9b9;
+        color: var(--error);
+      }
+
+      button.danger:hover:not(:disabled) {
+        background: var(--error-soft);
+      }
+
+      select {
+        width: 100%;
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--ink);
+        padding: 0 34px 0 12px;
+      }
+
+      label {
+        color: var(--muted);
+        display: block;
+        font-size: 0.76rem;
+        font-weight: 780;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      .app {
+        width: min(1180px, calc(100vw - 32px));
         margin: 0 auto;
-        padding: 34px 0;
+        padding: 32px 0;
       }
 
-      header {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
+      .masthead {
+        align-items: end;
+        display: grid;
+        gap: 18px;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
         margin-bottom: 18px;
       }
 
+      .eyebrow {
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 820;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+      }
+
       h1 {
-        margin: 0;
-        font-size: clamp(1.55rem, 4vw, 2.25rem);
+        font-size: clamp(1.7rem, 4vw, 2.45rem);
+        font-weight: 820;
+        line-height: 1.08;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+        margin-top: 10px;
+        max-width: 760px;
+      }
+
+      .connection {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .connection-row {
+        align-items: center;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+      }
+
+      .connection-title {
+        color: var(--muted);
+        font-size: 0.78rem;
         font-weight: 780;
-        letter-spacing: 0;
+        text-transform: uppercase;
       }
 
       .endpoint {
-        color: var(--muted);
-        font-size: 0.92rem;
+        color: var(--quiet);
+        font-size: 0.88rem;
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+      }
+
+      .status-pill,
+      .refresh-pill,
+      .metric {
+        align-items: center;
+        border-radius: 999px;
+        display: inline-flex;
+        gap: 7px;
         white-space: nowrap;
+      }
+
+      .status-pill {
+        background: var(--warning-soft);
+        color: var(--warning);
+        font-size: 0.86rem;
+        font-weight: 760;
+        padding: 7px 10px;
+      }
+
+      .status-pill.good {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+      }
+
+      .status-pill.bad {
+        background: var(--error-soft);
+        color: var(--error);
+      }
+
+      .dot {
+        background: currentColor;
+        border-radius: 50%;
+        flex: 0 0 auto;
+        height: 9px;
+        width: 9px;
+      }
+
+      .workspace {
+        align-items: start;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr) 330px;
       }
 
       .panel {
         background: var(--panel);
         border: 1px solid var(--line);
         border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel-header {
+        align-items: start;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        gap: 14px;
+        justify-content: space-between;
         padding: 18px;
       }
 
-      .toolbar {
-        align-items: end;
-        display: grid;
-        grid-template-columns: minmax(170px, 260px) 1fr auto;
-        gap: 12px;
-        margin-bottom: 14px;
+      .panel-title {
+        font-size: 1.05rem;
+        font-weight: 820;
       }
 
-      label {
-        display: block;
-        color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 760;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-      }
-
-      select,
-      button {
-        min-height: 40px;
-        border-radius: 6px;
-        font: inherit;
-      }
-
-      select {
-        width: 100%;
-        border: 1px solid var(--line);
-        background: var(--panel);
-        color: var(--ink);
-        padding: 0 12px;
-      }
-
-      button {
-        border: 1px solid transparent;
-        cursor: pointer;
-        font-weight: 760;
-        padding: 0 14px;
-      }
-
-      button.primary {
-        background: var(--accent);
-        color: white;
-      }
-
-      button.primary:hover {
-        background: var(--accent-strong);
-      }
-
-      button.secondary {
-        background: transparent;
-        border-color: var(--line);
-        color: var(--ink);
-      }
-
-      button:disabled {
-        cursor: not-allowed;
-        opacity: 0.52;
-      }
-
-      .summary {
+      .panel-subtitle {
         color: var(--muted);
         font-size: 0.92rem;
-        margin-bottom: 12px;
+        line-height: 1.45;
+        margin-top: 5px;
+      }
+
+      .refresh-pill {
+        background: var(--panel-muted);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        flex: 0 0 auto;
+        font-size: 0.84rem;
+        font-weight: 720;
+        padding: 7px 10px;
+      }
+
+      .refresh-pill.good {
+        background: var(--accent-soft);
+        border-color: #c4dfd5;
+        color: var(--accent-strong);
+      }
+
+      .refresh-pill.bad {
+        background: var(--error-soft);
+        border-color: #edc4c4;
+        color: var(--error);
+      }
+
+      .controls {
+        align-items: end;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(190px, 260px) 1fr auto auto;
+        padding: 14px 18px;
+      }
+
+      .track-count {
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.4;
+        padding-bottom: 9px;
       }
 
       .track-list {
         display: grid;
-        gap: 8px;
+        gap: 10px;
+        padding: 0 18px 18px;
       }
 
-      .track-row {
+      .track-card {
         align-items: center;
-        background: var(--panel);
+        background: var(--panel-muted);
         border: 1px solid var(--line);
         border-radius: 8px;
         display: grid;
-        grid-template-columns: 96px 1fr auto;
         gap: 14px;
-        min-height: 88px;
-        padding: 8px;
+        grid-template-columns: 112px minmax(0, 1fr) auto;
+        min-height: 112px;
+        padding: 10px;
       }
 
-      .track-row.active {
-        background: var(--active);
+      .track-card.active {
+        background: var(--accent-soft);
         border-color: var(--accent);
       }
 
       .snapshot {
         align-items: center;
         aspect-ratio: 4 / 3;
-        background: var(--soft);
+        background: #edf2f0;
         border: 1px solid var(--line);
         border-radius: 6px;
-        color: var(--muted);
+        color: var(--quiet);
         display: flex;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         justify-content: center;
         overflow: hidden;
-        width: 96px;
+        text-align: center;
+        width: 112px;
       }
 
       .snapshot img {
@@ -173,141 +331,273 @@
         width: 100%;
       }
 
-      .track-title {
-        font-size: 1rem;
-        font-weight: 780;
-        margin-bottom: 6px;
+      .track-main {
+        min-width: 0;
       }
 
-      .track-meta {
-        color: var(--muted);
+      .track-title {
+        align-items: baseline;
         display: flex;
         flex-wrap: wrap;
-        font-size: 0.9rem;
-        gap: 10px;
+        gap: 8px;
+        margin-bottom: 9px;
       }
 
-      .empty {
-        border: 1px dashed var(--line);
+      .track-name {
+        font-size: 1.02rem;
+        font-weight: 820;
+        overflow-wrap: anywhere;
+        text-transform: capitalize;
+      }
+
+      .track-id {
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 760;
+      }
+
+      .track-meta,
+      .coordinates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .metric {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 700;
+        padding: 6px 9px;
+      }
+
+      .coordinates {
+        color: var(--quiet);
+        font-size: 0.86rem;
+        margin-top: 9px;
+      }
+
+      .track-actions {
+        display: grid;
+        gap: 8px;
+        justify-items: end;
+      }
+
+      .active-note {
+        color: var(--accent-strong);
+        font-size: 0.82rem;
+        font-weight: 760;
+      }
+
+      .empty,
+      .loading,
+      .error-box {
+        border: 1px dashed var(--line-strong);
         border-radius: 8px;
         color: var(--muted);
-        padding: 28px 18px;
+        padding: 32px 18px;
         text-align: center;
       }
 
-      .status {
-        border-top: 1px solid var(--line);
-        margin-top: 18px;
-        padding-top: 16px;
+      .error-box {
+        background: var(--error-soft);
+        border-color: #edc4c4;
+        color: var(--error);
       }
 
-      .status-line {
-        align-items: center;
-        display: flex;
+      .status-panel {
+        position: sticky;
+        top: 18px;
+      }
+
+      .status-body {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .nav-message {
+        background: var(--panel-muted);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        line-height: 1.45;
+        min-height: 86px;
+        padding: 14px;
+      }
+
+      .status-grid {
+        display: grid;
         gap: 10px;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--muted);
-        flex: 0 0 auto;
+      .status-item {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 10px;
       }
 
-      .dot.good {
-        background: var(--accent);
+      .status-item:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
       }
 
-      .dot.warn {
-        background: var(--warning);
-      }
-
-      .dot.bad {
-        background: var(--error);
-      }
-
-      .status-text {
-        line-height: 1.4;
-      }
-
-      .meta {
+      .status-label {
         color: var(--muted);
-        font-size: 0.9rem;
-        margin-top: 8px;
+        font-size: 0.74rem;
+        font-weight: 780;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+      }
+
+      .status-value {
+        color: var(--ink);
+        font-size: 0.94rem;
+        overflow-wrap: anywhere;
+      }
+
+      @media (max-width: 920px) {
+        .masthead,
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .status-panel {
+          position: static;
+        }
       }
 
       @media (max-width: 720px) {
-        main {
-          width: min(100vw - 22px, 1080px);
+        .app {
+          width: min(100vw - 22px, 1180px);
           padding: 22px 0;
         }
 
-        header,
-        .toolbar,
-        .track-row {
+        .panel-header,
+        .connection-row {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .controls,
+        .track-card {
           grid-template-columns: 1fr;
-          display: grid;
         }
 
-        header {
-          align-items: start;
-        }
-
-        .endpoint {
-          white-space: normal;
-        }
-
-        .track-row {
-          align-items: start;
+        .track-count {
+          padding-bottom: 0;
         }
 
         .snapshot {
-          width: min(100%, 180px);
+          width: min(100%, 190px);
+        }
+
+        .track-actions {
+          justify-items: stretch;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <h1>Office Bot Object Hunt</h1>
-        <div class="endpoint" id="endpoint"></div>
+    <main class="app">
+      <header class="masthead">
+        <div>
+          <div class="eyebrow">OpenHRI Office</div>
+          <h1>Object Search Console</h1>
+          <p class="subtitle">
+            Monitor localized object tracks, inspect confidence, and request navigation
+            from a single research-facing operator view.
+          </p>
+        </div>
+
+        <section class="connection" aria-label="Connection status">
+          <div class="connection-row">
+            <div class="connection-title">Web UI</div>
+            <div class="status-pill" id="connectionPill">
+              <span class="dot"></span>
+              <span id="connectionText">Connecting</span>
+            </div>
+          </div>
+          <div class="endpoint" id="endpoint"></div>
+        </section>
       </header>
 
-      <section class="panel">
-        <div class="toolbar">
-          <div>
-            <label for="classFilter">Object</label>
-            <select id="classFilter"></select>
+      <div class="workspace">
+        <section class="panel" aria-labelledby="tracksTitle">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title" id="tracksTitle">Remembered objects</h2>
+              <p class="panel-subtitle" id="summaryText">Loading object tracks...</p>
+            </div>
+            <div class="refresh-pill" id="refreshState">
+              <span class="dot"></span>
+              <span>Updating</span>
+            </div>
           </div>
-          <div class="summary" id="summaryText"></div>
-          <button class="secondary" id="clearButton">Clear Tracks</button>
-        </div>
 
-        <div class="track-list" id="trackList"></div>
-
-        <div class="status">
-          <div class="status-line">
-            <span class="dot" id="statusDot"></span>
-            <div class="status-text" id="statusText">Connecting...</div>
+          <div class="controls">
+            <div>
+              <label for="classFilter">Object class</label>
+              <select id="classFilter"></select>
+            </div>
+            <div class="track-count" id="trackCount">Waiting for confirmed tracks.</div>
+            <button class="secondary" id="refreshButton">Refresh</button>
+            <button class="danger" id="clearButton">Clear tracks</button>
           </div>
-          <div class="meta" id="metaText"></div>
-        </div>
-      </section>
+
+          <div class="track-list" id="trackList">
+            <div class="loading">Loading confirmed object tracks...</div>
+          </div>
+        </section>
+
+        <aside class="panel status-panel" aria-labelledby="statusTitle">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title" id="statusTitle">Navigation status</h2>
+              <p class="panel-subtitle">Robot request state and active target.</p>
+            </div>
+          </div>
+
+          <div class="status-body">
+            <div class="nav-message" id="statusText">Connecting to object detector...</div>
+            <div class="status-grid">
+              <div class="status-item">
+                <div class="status-label">State</div>
+                <div class="status-value" id="stateText">Unknown</div>
+              </div>
+              <div class="status-item">
+                <div class="status-label">Active track</div>
+                <div class="status-value" id="activeTrackText">None</div>
+              </div>
+              <div class="status-item">
+                <div class="status-label">Last update</div>
+                <div class="status-value" id="lastUpdatedText">Not updated yet</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </main>
 
     <script>
+      const activeTrackText = document.getElementById("activeTrackText");
       const classFilter = document.getElementById("classFilter");
       const clearButton = document.getElementById("clearButton");
+      const connectionPill = document.getElementById("connectionPill");
+      const connectionText = document.getElementById("connectionText");
       const endpoint = document.getElementById("endpoint");
-      const metaText = document.getElementById("metaText");
-      const statusDot = document.getElementById("statusDot");
+      const lastUpdatedText = document.getElementById("lastUpdatedText");
+      const refreshButton = document.getElementById("refreshButton");
+      const refreshState = document.getElementById("refreshState");
+      const stateText = document.getElementById("stateText");
       const statusText = document.getElementById("statusText");
       const summaryText = document.getElementById("summaryText");
+      const trackCount = document.getElementById("trackCount");
       const trackList = document.getElementById("trackList");
 
       let activeTrackId = null;
+      let isLoading = true;
+      let lastError = "";
+      let lastUpdated = null;
       let selectedClass = "";
       let tracks = [];
 
@@ -328,7 +618,7 @@
 
         const all = document.createElement("option");
         all.value = "";
-        all.textContent = classes.length ? "All objects" : "No tracked objects";
+        all.textContent = classes.length ? "All object classes" : "No confirmed classes";
         classFilter.appendChild(all);
 
         classes.forEach((className) => {
@@ -345,79 +635,137 @@
       }
 
       function formatNumber(value) {
-        return Number(value || 0).toFixed(2);
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed.toFixed(2) : "0.00";
+      }
+
+      function formatPercent(value) {
+        return `${Math.round((Number(value) || 0) * 100)}%`;
+      }
+
+      function formatTime(value) {
+        if (!value) {
+          return "Not updated yet";
+        }
+        return value.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      }
+
+      function makeElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) {
+          element.className = className;
+        }
+        if (text !== undefined) {
+          element.textContent = text;
+        }
+        return element;
+      }
+
+      function setRefreshState(kind, message) {
+        refreshState.className = `refresh-pill ${kind || ""}`.trim();
+        refreshState.querySelector("span:last-child").textContent = message;
+      }
+
+      function setConnection(kind, message) {
+        connectionPill.className = `status-pill ${kind || ""}`.trim();
+        connectionText.textContent = message;
       }
 
       function renderTracks() {
         trackList.innerHTML = "";
-        summaryText.textContent = tracks.length
-          ? `${tracks.length} remembered object${tracks.length === 1 ? "" : "s"}`
-          : "No remembered objects";
+
+        const visibleCount = tracks.length;
+        const objectLabel = visibleCount === 1 ? "object" : "objects";
+        const filterLabel = selectedClass ? ` matching "${selectedClass}"` : "";
+
+        summaryText.textContent = visibleCount
+          ? `${visibleCount} confirmed ${objectLabel}${filterLabel}.`
+          : `No confirmed object tracks${filterLabel}.`;
+        trackCount.textContent = visibleCount
+          ? `${visibleCount} track${visibleCount === 1 ? "" : "s"} ready for review.`
+          : "Waiting for confirmed detector tracks.";
+        clearButton.disabled = !tracks.length;
+
+        if (lastError && !tracks.length) {
+          trackList.appendChild(
+            makeElement("div", "error-box", `Could not load object tracks: ${lastError}`)
+          );
+          return;
+        }
+
+        if (isLoading && !tracks.length) {
+          trackList.appendChild(makeElement("div", "loading", "Loading confirmed object tracks..."));
+          return;
+        }
 
         if (!tracks.length) {
-          const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "No confirmed objects yet.";
-          trackList.appendChild(empty);
+          const message = selectedClass
+            ? `No confirmed "${selectedClass}" tracks yet.`
+            : "No confirmed objects yet. Start the detector and wait for a stable localized track.";
+          trackList.appendChild(makeElement("div", "empty", message));
           return;
         }
 
         tracks.forEach((track) => {
-          const row = document.createElement("div");
-          row.className = "track-row";
-          if (track.track_id === activeTrackId) {
-            row.classList.add("active");
-          }
+          const isActive = track.track_id === activeTrackId;
+          const row = makeElement("article", `track-card${isActive ? " active" : ""}`);
 
-          const snapshot = document.createElement("div");
-          snapshot.className = "snapshot";
+          const snapshot = makeElement("div", "snapshot");
           if (track.snapshot) {
             const image = document.createElement("img");
             image.src = track.snapshot;
-            image.alt = `${track.class_name} ${track.track_id}`;
+            image.alt = `${track.class_name} track ${track.track_id}`;
             snapshot.appendChild(image);
           } else {
-            snapshot.textContent = "No image";
+            snapshot.textContent = "No snapshot";
           }
 
-          const details = document.createElement("div");
-          const title = document.createElement("div");
-          title.className = "track-title";
-          title.textContent = `${track.class_name} #${track.track_id}`;
+          const details = makeElement("div", "track-main");
+          const title = makeElement("div", "track-title");
+          title.appendChild(makeElement("div", "track-name", track.class_name || "object"));
+          title.appendChild(makeElement("div", "track-id", `Track ${track.track_id}`));
 
-          const meta = document.createElement("div");
-          meta.className = "track-meta";
-          meta.innerHTML = `
-            <span>x ${formatNumber(track.x)}</span>
-            <span>y ${formatNumber(track.y)}</span>
-            <span>confidence ${Math.round((track.confidence || 0) * 100)}%</span>
-            <span>${track.detections || 0} detections</span>
-          `;
+          const meta = makeElement("div", "track-meta");
+          meta.appendChild(makeElement("span", "metric", `Confidence ${formatPercent(track.confidence)}`));
+          meta.appendChild(makeElement("span", "metric", `${track.detections || 0} detections`));
+
+          const coordinates = makeElement("div", "coordinates");
+          coordinates.appendChild(makeElement("span", "", `x ${formatNumber(track.x)} m`));
+          coordinates.appendChild(makeElement("span", "", `y ${formatNumber(track.y)} m`));
 
           details.appendChild(title);
           details.appendChild(meta);
+          details.appendChild(coordinates);
 
-          const action = document.createElement("button");
-          action.className = "primary";
-          action.textContent = track.track_id === activeTrackId ? "Active" : "Navigate";
-          action.disabled = track.track_id === activeTrackId;
+          const actions = makeElement("div", "track-actions");
+          const action = makeElement("button", "primary", isActive ? "Navigating" : "Navigate");
+          action.disabled = isActive;
           action.addEventListener("click", () => navigate(track.track_id));
+          actions.appendChild(action);
+          if (isActive) {
+            actions.appendChild(makeElement("div", "active-note", "Active target"));
+          }
 
           row.appendChild(snapshot);
           row.appendChild(details);
-          row.appendChild(action);
+          row.appendChild(actions);
           trackList.appendChild(row);
         });
       }
 
       async function refreshClasses() {
         const payload = await fetchJson("/api/classes");
-        setClassOptions(payload.classes);
+        setClassOptions(payload.classes || []);
       }
 
       async function refreshTracks() {
         const className = encodeURIComponent(selectedClass || "");
         const payload = await fetchJson(`/api/locations?class=${className}`);
+        lastError = "";
         tracks = payload.locations || [];
         renderTracks();
       }
@@ -425,20 +773,22 @@
       async function refreshStatus() {
         const status = await fetchJson("/api/status");
         activeTrackId = status.track_id;
-        statusText.textContent = status.message || "No status.";
-        metaText.textContent = status.track_id ? `Track ${status.track_id}` : "";
-        statusDot.className = "dot";
+        statusText.textContent = status.message || "Detector is reachable. No navigation request is active.";
+        stateText.textContent = status.state || "idle";
+        activeTrackText.textContent = status.track_id ? `Track ${status.track_id}` : "None";
+
         if (["accepted", "requested", "tracking", "succeeded"].includes(status.state)) {
-          statusDot.classList.add("good");
-        } else if (["localization_unavailable", "idle", "finished"].includes(status.state)) {
-          statusDot.classList.add("warn");
+          setConnection("good", "Connected");
         } else if (["error", "rejected", "perception_error"].includes(status.state)) {
-          statusDot.classList.add("bad");
+          setConnection("bad", "Needs attention");
+        } else {
+          setConnection("", "Connected");
         }
       }
 
       async function navigate(trackId) {
         try {
+          setRefreshState("", "Sending request");
           const payload = await fetchJson("/api/navigate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -447,39 +797,91 @@
           statusText.textContent = payload.message;
           await refreshStatus();
           renderTracks();
+          setRefreshState("good", "Request sent");
         } catch (error) {
+          lastError = error.message;
           statusText.textContent = error.message;
-          statusDot.className = "dot bad";
+          setConnection("bad", "Request failed");
+          setRefreshState("bad", "Request failed");
         }
       }
 
       async function clearTracks() {
-        await fetchJson("/api/clear", { method: "POST" });
-        tracks = [];
-        await refreshClasses();
-        await refreshTracks();
-        await refreshStatus();
+        if (!tracks.length) {
+          return;
+        }
+
+        const confirmed = window.confirm(
+          "Clear all remembered object tracks? This cannot be undone."
+        );
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          setRefreshState("", "Clearing");
+          await fetchJson("/api/clear", { method: "POST" });
+          tracks = [];
+          await refreshClasses();
+          await refreshTracks();
+          await refreshStatus();
+          setRefreshState("good", "Tracks cleared");
+        } catch (error) {
+          lastError = error.message;
+          statusText.textContent = error.message;
+          setConnection("bad", "Clear failed");
+          setRefreshState("bad", "Clear failed");
+          renderTracks();
+        }
       }
 
       classFilter.addEventListener("change", async () => {
         selectedClass = classFilter.value;
-        await refreshTracks();
+        isLoading = true;
+        renderTracks();
+        try {
+          await refreshTracks();
+          setRefreshState("good", "Filter applied");
+        } catch (error) {
+          lastError = error.message;
+          setRefreshState("bad", "Filter failed");
+          renderTracks();
+        } finally {
+          isLoading = false;
+        }
       });
-      clearButton.addEventListener("click", clearTracks);
 
-      async function refreshAll() {
+      clearButton.addEventListener("click", clearTracks);
+      refreshButton.addEventListener("click", () => refreshAll());
+
+      async function refreshAll(options = {}) {
+        const silent = Boolean(options.silent);
+        if (!silent) {
+          isLoading = true;
+          setRefreshState("", "Updating");
+          renderTracks();
+        }
+
         try {
           await refreshClasses();
           await refreshStatus();
           await refreshTracks();
+          lastUpdated = new Date();
+          lastUpdatedText.textContent = formatTime(lastUpdated);
+          setRefreshState("good", silent ? `Updated ${formatTime(lastUpdated)}` : "Updated");
         } catch (error) {
+          lastError = error.message;
           statusText.textContent = error.message;
-          statusDot.className = "dot bad";
+          setConnection("bad", "Disconnected");
+          setRefreshState("bad", "Update failed");
+          renderTracks();
+        } finally {
+          isLoading = false;
         }
       }
 
       refreshAll();
-      setInterval(refreshAll, 2000);
+      setInterval(() => refreshAll({ silent: true }), 2000);
     </script>
   </body>
 </html>
