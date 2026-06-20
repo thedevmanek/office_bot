@@ -17,6 +17,16 @@ ARG OPENHRI_DOWNLOAD_YOLOX_CHECKPOINT=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    gnupg \
+  && curl -fsSL https://packages.osrfoundation.org/gazebo.gpg \
+    | gpg --dearmor -o /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable jammy main" \
+    > /etc/apt/sources.list.d/gazebo-stable.list \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
     dbus-x11 \
     git \
     mesa-utils \
@@ -28,6 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pytest \
     python3-rosdep \
     supervisor \
+    tmux \
     websockify \
     wget \
     x11vnc \

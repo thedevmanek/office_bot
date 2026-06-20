@@ -30,7 +30,7 @@ make sim
 Start object detection in another terminal:
 
 ```bash
-make detector
+make trial TRIAL=bottle-demo
 ```
 
 Open the object search console:
@@ -160,4 +160,7 @@ HRI signals:
 
 ## Event Logging
 
-Use [logging-spec.md](logging-spec.md) to capture a lightweight JSONL trace for repeatable comparison across runs.
+Use [reproducibility.md](reproducibility.md) for recipe-backed trials that
+write one run folder containing the recipe, manifest, event log, summary, and
+reproduction script. Use [logging-spec.md](logging-spec.md) for the lower-level
+event schema.

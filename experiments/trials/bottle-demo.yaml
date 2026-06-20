@@ -1,0 +1,19 @@
+trial_id: bottle-demo
+scenario: object_search_approach
+world: office_world
+seed: 42
+
+robot:
+  start_pose:
+    x: 0.0
+    y: 0.0
+    yaw: 0.0
+
+target:
+  class: bottle
+  pose:
+    x: 2.4
+    y: -0.8
+    yaw: 0.0
+
+notes: Baseline bottle search trial for reproducibility checks.

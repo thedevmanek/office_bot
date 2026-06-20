@@ -14,9 +14,14 @@ from std_msgs.msg import Header
 from visualization_msgs.msg import Marker, MarkerArray
 
 from object_detector.datatypes import NavigationStatus
+from object_detector.event_log import JsonlEventLogger, event_log_config_from_params
 from object_detector.localization import LocalizationConfig, ObjectLocalizer
 from object_detector.model import ObjectDetectorModel
 from object_detector.navigation import NavigationConfig, ObjectNavigator
+from object_detector.run_manifest import (
+    RunManifestWriter,
+    run_manifest_config_from_params,
+)
 from object_detector.tracking import TrackManager, footprint_points
 from object_detector.web import ObjectHuntWebServer
 
@@ -29,6 +34,22 @@ class ObjectDetectionNode(Node):
         self.bridge = CvBridge()
         self.state_lock = threading.Lock()
         self.nav_status = NavigationStatus()
+        self.event_log = JsonlEventLogger(
+            event_log_config_from_params(self.params),
+            logger=self.get_logger(),
+        )
+        if self.event_log.enabled and self.event_log.path is not None:
+            self.get_logger().info(f"Object search event log: {self.event_log.path}")
+        self.run_manifest = RunManifestWriter(
+            run_manifest_config_from_params(self.params),
+            run_id=self.event_log.run_id,
+            params=self.params,
+            event_log_path=self.event_log.path,
+            logger=self.get_logger(),
+        )
+        if self.run_manifest.write() and self.run_manifest.path is not None:
+            self.get_logger().info(f"Run manifest: {self.run_manifest.path}")
+        self._record_trial_start()
 
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
@@ -118,6 +139,23 @@ class ObjectDetectionNode(Node):
             "lidar_bearing_offset_deg": 0.0,
             "web_host": "0.0.0.0",
             "web_port": 8080,
+            "event_log_enabled": True,
+            "event_log_dir": "log/events",
+            "event_log_path": "",
+            "event_log_run_id": "",
+            "event_log_scenario": "object_search_approach",
+            "run_manifest_enabled": True,
+            "run_manifest_dir": "log/manifests",
+            "run_manifest_path": "",
+            "run_manifest_trial_id": "",
+            "run_manifest_world": "office_world",
+            "run_manifest_robot_start_pose": "",
+            "run_manifest_target_class": "",
+            "run_manifest_target_object_pose": "",
+            "run_manifest_random_seed": "",
+            "run_manifest_notes": "",
+            "run_manifest_recipe_path": "",
+            "run_manifest_run_dir": "",
             "lidar_frame": "lidar_link",
             "map_frame": "map",
             "base_frame": "base_footprint",
@@ -301,19 +339,46 @@ class ObjectDetectionNode(Node):
             position_confidence = self.localizer.position_confidence(
                 detection.confidence, localization.cluster
             )
+            now = self._now_seconds()
             with self.state_lock:
+                previously_confirmed = {
+                    track_id
+                    for track_id, track in self.tracks.tracks.items()
+                    if track.confirmed
+                }
                 track_id = self.tracks.update_track(
                     detection.class_name,
                     localization.point,
                     detection.confidence,
                     obstacle_radius,
                     position_confidence,
-                    self._now_seconds(),
+                    now,
                     snapshot=snapshot,
                 )
-                track, _ = self.tracks.get_confirmed_track(
-                    track_id, self._now_seconds()
-                )
+                track, _ = self.tracks.get_confirmed_track(track_id, now)
+                newly_confirmed = [
+                    self.tracks.tracks[confirmed_id].as_dict()
+                    for confirmed_id in sorted(
+                        {
+                            confirmed_id
+                            for confirmed_id, confirmed in self.tracks.tracks.items()
+                            if confirmed.confirmed
+                        }
+                        - previously_confirmed
+                    )
+                    if confirmed_id in self.tracks.tracks
+                ]
+            self._log_object_localized(
+                detection,
+                localization,
+                track_id,
+                observed_radius,
+                obstacle_radius,
+                position_confidence,
+                now,
+            )
+            for confirmed_track in newly_confirmed:
+                self._log_track_confirmed(confirmed_track, now)
             if track is not None:
                 self.navigator.observe_track(track)
             localized_count += 1
@@ -552,12 +617,26 @@ class ObjectDetectionNode(Node):
             return self.nav_status.as_dict()
 
     def clear_tracks(self):
+        now = self._now_seconds()
         with self.state_lock:
+            track_count = len(self.tracks.tracks)
+            confirmed_count = sum(
+                1 for track in self.tracks.tracks.values() if track.confirmed
+            )
             self.tracks.clear()
             self.nav_status = NavigationStatus(
                 state="idle", message="Tracks cleared.", track_id=None
             )
         self.navigator.clear_plans()
+        self._log_event(
+            "tracks_cleared",
+            {
+                "track_count": track_count,
+                "confirmed_count": confirmed_count,
+                "source": "api",
+            },
+            t=now,
+        )
 
         marker = Marker()
         marker.action = Marker.DELETEALL
@@ -565,22 +644,97 @@ class ObjectDetectionNode(Node):
         marker_array.markers.append(marker)
         self.marker_pub.publish(marker_array)
 
-    def navigate_to_track(self, track_id):
+    def navigate_to_track(self, track_id, source="api"):
+        now = self._now_seconds()
         with self.state_lock:
-            track, error = self.tracks.get_confirmed_track(track_id, self._now_seconds())
-            if error:
-                self.nav_status = NavigationStatus(
-                    state="error", message=error, track_id=track_id
-                )
-                return False, error
+            track, error = self.tracks.get_confirmed_track(track_id, now)
+        if error:
+            self._set_status("error", error, track_id)
+            return False, error
 
+        self._log_event(
+            "navigation_requested",
+            {
+                "track_id": track["track_id"],
+                "class": track["class_name"],
+                "x": track["x"],
+                "y": track["y"],
+                "source": source,
+            },
+            t=now,
+        )
         return self.navigator.navigate_to_track(track)
 
     def _set_status(self, state, message, track_id=None):
         with self.state_lock:
-            self.nav_status = NavigationStatus(
-                state=state, message=message, track_id=track_id
+            previous_status = self.nav_status.as_dict()
+            status = NavigationStatus(state=state, message=message, track_id=track_id)
+            self.nav_status = status
+        if (
+            state in ("succeeded", "error")
+            and track_id is not None
+            and previous_status != status.as_dict()
+        ):
+            self._log_event(
+                "navigation_result",
+                {
+                    "track_id": track_id,
+                    "status": state,
+                    "message": message,
+                },
             )
+
+    def _log_object_localized(
+        self,
+        detection,
+        localization,
+        track_id,
+        observed_radius,
+        obstacle_radius,
+        position_confidence,
+        now,
+    ):
+        self._log_event(
+            "object_localized",
+            {
+                "track_id": track_id,
+                "class": detection.class_name,
+                "x": localization.point.point.x,
+                "y": localization.point.point.y,
+                "confidence": detection.confidence,
+                "position_confidence": position_confidence,
+                "source": localization.cluster.source,
+                "observed_radius_m": observed_radius,
+                "obstacle_radius_m": obstacle_radius,
+            },
+            t=now,
+        )
+
+    def _log_track_confirmed(self, track, now):
+        self._log_event(
+            "track_confirmed",
+            {
+                "track_id": track["track_id"],
+                "class": track["class_name"],
+                "x": track["x"],
+                "y": track["y"],
+                "detections": track["detections"],
+                "position_confidence": track["position_confidence"],
+            },
+            t=now,
+        )
+
+    def _record_trial_start(self):
+        self.event_log.record(
+            "trial_start",
+            self.run_manifest.trial_start_fields(),
+            t=0.0,
+        )
+
+    def _log_event(self, event, fields=None, t=None):
+        if t is None:
+            t = self._now_seconds()
+        return self.event_log.record(event, fields or {}, t=t)
 
     def _now_seconds(self):
         return self.get_clock().now().nanoseconds / 1e9
@@ -588,6 +742,7 @@ class ObjectDetectionNode(Node):
     def destroy_node(self):
         if self.web_server is not None:
             self.web_server.shutdown()
+        self.event_log.close()
         super().destroy_node()
 
 

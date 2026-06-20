@@ -98,7 +98,10 @@ make start          # Pull runtime, mount source, and bootstrap workspace
 make start-cached   # Run the cached image without pulling
 make start-local    # Build the runtime image locally and run it
 make bootstrap      # Rebuild the mounted ROS workspace
+make test           # Rebuild and run package tests inside the container
 make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
+make researcher-session  # Recreate a 2x2 tmux split grid for logs and artifacts
+make trial TRIAL=bottle-demo  # Run a reproducible recipe-backed detector trial
 make detector       # Start object detection and stream logs
 make detector-bg    # Start object detection without following logs
 make detector-logs  # Follow detector logs
@@ -112,11 +115,40 @@ make clean-volumes  # Remove cached build/install/log volumes
 
 ## Recommended Run Order
 
-Use three views:
+For the most transparent researcher run, use one tmux session:
+
+```bash
+make researcher-session
+```
+
+It opens one tmux `run` window split into a 2x2 grid:
+
+- top-left: simulation launch logs
+- bottom-left: recipe-backed detector logs
+- top-right: container logs
+- bottom-right: live run artifacts
+
+Mouse scrolling is enabled, and pane names are shown in the pane borders. A
+separate `shell` window gives an interactive ROS-ready shell, and a `help`
+window repeats the controls. Click panes/window names or use tmux keyboard
+navigation.
+
+If a pane command exits or fails, that pane stays open at a shell prompt. Type
+`rerun` in the pane to execute the same command again, or press Up then Enter to
+edit and rerun the last command.
+
+`make researcher-session` replaces any existing `openhri` tmux session, so stale
+split-pane layouts are not reused. Use `make researcher-attach` only when you
+want to return to the existing session without recreating it.
+
+Stop everything from inside tmux with `Ctrl-b` then `X`, or press `F12`. From a
+normal terminal, use `make researcher-stop`.
+
+For a manual run, use three views:
 
 1. Browser: noVNC desktop.
 2. Terminal 1: `make sim`.
-3. Terminal 2: `make detector`.
+3. Terminal 2: `make trial TRIAL=bottle-demo`.
 
 Then open the object UI at:
 
@@ -130,9 +162,14 @@ http://localhost:8080/
 - The first `make start` pulls the published runtime image, then bootstraps the mounted ROS workspace.
 - Source changes under `dev_ws/` usually need `make bootstrap`, not a new image.
 - Runtime image changes under `Containerfile`, `compose.yaml`, or `container/` need `make start-local` during development and a new published image for evaluators.
+- Run `make test` before sharing a changed branch; tests execute inside the preview container after rebuilding the mounted workspace.
+- `make researcher-session` requires tmux on the host and gives researchers full-screen, scrollable views of runtime logs and generated artifacts.
 - Object detection is CPU-only by default; frame rate depends on host performance.
 - The simulation launch sets Gazebo model paths so `model://...` assets resolve inside the installed workspace.
 - The browser preview is the best path for evaluation, demos, and study-design feedback.
+- Recipe-backed trials write artifacts under `runs/<trial_id>/`.
+- Use `make trial-plan TRIAL=bottle-demo` to validate and materialize a run directory without starting the detector.
+- Use `make trial-pack TRIAL=bottle-demo` to create a shareable reproducibility zip.
 
 ## When To Rebuild
 
