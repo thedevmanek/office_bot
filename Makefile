@@ -1,4 +1,4 @@
-IMAGE ?= ghcr.io/thedevmanek/openhri-office:0.1.0-preview
+IMAGE ?= ghcr.io/thedevmanek/openhri-office:latest-preview
 CONTAINER ?= openhri-office
 CONTAINERFILE ?= Containerfile
 NOVNC_URL ?= http://localhost:6080/vnc.html?autoconnect=1&resize=remote

@@ -36,7 +36,7 @@ OPENHRI_PLATFORM=linux/amd64
 The supported runtime is Podman. The runtime image is published on GitHub Container Registry as:
 
 ```text
-ghcr.io/thedevmanek/openhri-office:0.1.0-preview
+ghcr.io/thedevmanek/openhri-office:latest-preview
 ```
 
 ## Quickstart
@@ -76,7 +76,7 @@ For a step-by-step walkthrough, use [docs/quickstart.md](docs/quickstart.md).
 
 ## Expected First Run
 
-The first `make start` runs read-only preflight checks, pulls `ghcr.io/thedevmanek/openhri-office:0.1.0-preview`, starts the container, mounts this checkout read-only, builds the mounted ROS workspace into named Podman volumes, and prints browser URLs. It does not build the image locally. Use `make start-local` when you intentionally want to build the runtime image from this checkout.
+The first `make start` runs read-only preflight checks, pulls `ghcr.io/thedevmanek/openhri-office:latest-preview`, starts the container, mounts this checkout read-only, builds the mounted ROS workspace into named Podman volumes, and prints browser URLs. It does not build the image locally. Use `make start-local` when you intentionally want to build the runtime image from this checkout.
 
 The runtime image contains ROS, Gazebo, RViz, Nav2, PyTorch, YOLOX, noVNC, startup scripts, and the YOLOX checkpoint. The repository checkout provides the ROS packages, launch files, world assets, object detector code, web UI, docs, and configs at runtime.
 
