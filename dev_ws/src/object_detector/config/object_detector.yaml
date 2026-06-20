@@ -48,6 +48,23 @@ object_detection_node:
     lidar_bearing_offset_deg: 0.0
     web_host: 0.0.0.0
     web_port: 8080
+    event_log_enabled: true
+    event_log_dir: log/events
+    event_log_path: ""
+    event_log_run_id: ""
+    event_log_scenario: object_search_approach
+    run_manifest_enabled: true
+    run_manifest_dir: log/manifests
+    run_manifest_path: ""
+    run_manifest_trial_id: ""
+    run_manifest_world: office_world
+    run_manifest_robot_start_pose: ""
+    run_manifest_target_class: ""
+    run_manifest_target_object_pose: ""
+    run_manifest_random_seed: ""
+    run_manifest_notes: ""
+    run_manifest_recipe_path: ""
+    run_manifest_run_dir: ""
     lidar_frame: lidar_link
     map_frame: map
     base_frame: base_footprint

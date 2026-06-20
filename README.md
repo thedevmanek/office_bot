@@ -102,7 +102,9 @@ make start          # Pull runtime, mount source, and bootstrap workspace
 make start-cached   # Run the cached image without pulling
 make start-local    # Build the runtime image locally and run it
 make bootstrap      # Rebuild the mounted ROS workspace
+make test           # Rebuild and run package tests inside the container
 make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
+make researcher-session  # Recreate a 2x2 tmux split grid for logs and artifacts
 make detector       # Start/restart object detection and stream logs
 make detector-bg    # Start/restart detection without following logs
 make detector-logs  # Follow detector logs
@@ -148,10 +150,44 @@ Common object-search tuning points:
 - `dev_ws/src/object_detector/object_detector/navigation.py`
 - `dev_ws/src/object_detector/web/index.html`
 
+## Researcher Workflow
+
+Use [docs/researcher-guide.md](docs/researcher-guide.md) when sharing the
+project with researchers who need to evaluate, modify, or package studies.
+
+The recommended validation path is:
+
+```bash
+make doctor
+make start
+make researcher-session
+make trial-pack TRIAL=bottle-demo
+```
+
+`make researcher-session` opens one tmux `run` window split into a 2x2 grid:
+simulation and detector on the left, container logs and run artifacts on the
+right. It replaces any stale `openhri` tmux session instead of reusing old
+layouts. Mouse scrolling is enabled. Use `Ctrl-b` then `X` or `F12` to stop the
+simulation, detector, and tmux session. Use `make researcher-attach` only when
+you intentionally want to reattach to the existing session, and
+`make researcher-stop` to stop from a normal terminal.
+If a pane command exits or fails, that pane stays open at a shell prompt; type
+`rerun` in the pane to execute the same command again.
+
+Most study changes should start by copying a recipe in `experiments/trials/`
+and validating it with the preview container running:
+
+```bash
+make trial-plan TRIAL=<trial-id>
+make test
+```
+
 ## Documentation
 
 - [Quickstart](docs/quickstart.md): shortest path to a working demo.
 - [Container quickstart](docs/container-quickstart.md): image, ports, platform, and operations notes.
+- [Researcher guide](docs/researcher-guide.md): trial recipes, tinker points, artifacts, and validation.
+- [Reproducibility](docs/reproducibility.md): recipe-backed runs, manifests, logs, and packaging.
 - [Runtime image release](docs/runtime-image-release.md): GHCR publishing and tag policy.
 - [Object Search and Approach](docs/object-search-and-approach.md): the primary research task.
 - [Troubleshooting](docs/troubleshooting.md): common setup and runtime problems.

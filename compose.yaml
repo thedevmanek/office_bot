@@ -12,12 +12,16 @@ services:
       - "${OPENHRI_VNC_PORT:-5900}:5900"
       - "${OPENHRI_OBJECT_UI_PORT:-8080}:8080"
     environment:
+      OPENHRI_IMAGE: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:0.1.0-preview}
+      OPENHRI_PLATFORM: ${OPENHRI_PLATFORM:-linux/arm64}
+      OPENHRI_REPO_ROOT: /workspace/openhri-office
       VNC_GEOMETRY: ${OPENHRI_VNC_GEOMETRY:-1600x900}
       LIBGL_ALWAYS_SOFTWARE: "1"
       MESA_GL_VERSION_OVERRIDE: "3.3"
       QT_X11_NO_MITSHM: "1"
     volumes:
       - .:/workspace/openhri-office:ro
+      - ./runs:/workspace/openhri-office/runs:rw
       - openhri-dev-build:/workspace/openhri-office/dev_ws/build
       - openhri-dev-install:/workspace/openhri-office/dev_ws/install
       - openhri-dev-log:/workspace/openhri-office/dev_ws/log
