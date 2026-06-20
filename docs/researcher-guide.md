@@ -244,9 +244,10 @@ Run `make bootstrap` after editing:
 Run `make start-local` or `make restart-local` after editing runtime image inputs:
 
 - `Containerfile`
-- `compose.yaml`
 - `container/*.sh`
 - desktop launcher files
+
+Run `make restart` after editing `compose.yaml`.
 
 ## Validation Before Sharing
 

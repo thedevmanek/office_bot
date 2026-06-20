@@ -2,7 +2,7 @@ name: openhri-office
 
 services:
   openhri-office:
-    image: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:0.1.0-preview}
+    image: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:latest-preview}
     pull_policy: never
     container_name: ${OPENHRI_CONTAINER_NAME:-openhri-office}
     platform: ${OPENHRI_PLATFORM:-linux/arm64}
@@ -12,7 +12,7 @@ services:
       - "${OPENHRI_VNC_PORT:-5900}:5900"
       - "${OPENHRI_OBJECT_UI_PORT:-8080}:8080"
     environment:
-      OPENHRI_IMAGE: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:0.1.0-preview}
+      OPENHRI_IMAGE: ${OPENHRI_IMAGE:-ghcr.io/thedevmanek/openhri-office:latest-preview}
       OPENHRI_PLATFORM: ${OPENHRI_PLATFORM:-linux/arm64}
       OPENHRI_REPO_ROOT: /workspace/openhri-office
       VNC_GEOMETRY: ${OPENHRI_VNC_GEOMETRY:-1600x900}

@@ -18,44 +18,27 @@ ROS build artifacts are stored in named Podman volumes for:
 
 ## Published Image
 
-The canonical image is:
-
-```text
-ghcr.io/thedevmanek/openhri-office:0.1.0-preview
-```
-
-The moving preview tag is:
+The default published runtime image is:
 
 ```text
 ghcr.io/thedevmanek/openhri-office:latest-preview
 ```
 
+Historical or versioned tags are not published by this workflow.
+
 ## Publishing
 
 GitHub Actions publishes the multi-architecture runtime image to GitHub Container Registry.
 
-The workflow publishes `latest-preview` on pushes to `main` when runtime-image inputs change:
+The workflow publishes `latest-preview` only after changes are merged to `main`
+and the merge commit changes one of these runtime-image inputs:
 
 - `Containerfile`
-- `compose.yaml`
 - `container/**`
 - `.github/workflows/publish-runtime-image.yml`
 
-Pull requests into `main` run the same multi-architecture image build for validation, but they do not push an image to GHCR. PR builds also populate the Buildx cache so the later `main` publish run can reuse layers when the merge commit has the same runtime inputs.
-
-The workflow also runs for tags matching `v*`. A tag such as:
-
-```text
-v0.1.0-preview
-```
-
-publishes:
-
-```text
-ghcr.io/thedevmanek/openhri-office:0.1.0-preview
-```
-
-You can also run the workflow manually with an `image_tag` input.
+Changes to `compose.yaml` do not trigger the image publish workflow because the
+compose file is a local runtime wrapper, not part of the built image.
 
 ## Local Runtime Build
 

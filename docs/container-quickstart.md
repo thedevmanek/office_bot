@@ -14,7 +14,7 @@ make start
 `make doctor` runs read-only preflight checks. `make start` pulls and runs the published GitHub Container Registry runtime image:
 
 ```text
-ghcr.io/thedevmanek/openhri-office:0.1.0-preview
+ghcr.io/thedevmanek/openhri-office:latest-preview
 ```
 
 Open the desktop:
@@ -57,7 +57,7 @@ OPENHRI_PLATFORM=linux/amd64 make start
 The default published runtime image tag is:
 
 ```text
-ghcr.io/thedevmanek/openhri-office:0.1.0-preview
+ghcr.io/thedevmanek/openhri-office:latest-preview
 ```
 
 The project supports these image platforms:
@@ -161,7 +161,8 @@ http://localhost:8080/
 - The container uses software rendering for broad laptop compatibility.
 - The first `make start` pulls the published runtime image, then bootstraps the mounted ROS workspace.
 - Source changes under `dev_ws/` usually need `make bootstrap`, not a new image.
-- Runtime image changes under `Containerfile`, `compose.yaml`, or `container/` need `make start-local` during development and a new published image for evaluators.
+- Runtime image changes under `Containerfile` or `container/` need `make start-local` during development and a new published image for evaluators.
+- Compose changes only change the local runtime wrapper; use `make restart` to recreate the container with the updated wrapper.
 - Run `make test` before sharing a changed branch; tests execute inside the preview container after rebuilding the mounted workspace.
 - `make researcher-session` requires tmux on the host and gives researchers full-screen, scrollable views of runtime logs and generated artifacts.
 - Object detection is CPU-only by default; frame rate depends on host performance.
@@ -176,7 +177,6 @@ http://localhost:8080/
 Run `make start-local` or `make restart-local` after changing runtime image inputs:
 
 - `Containerfile`
-- `compose.yaml`
 - `container/*.sh`
 - desktop launcher files
 
