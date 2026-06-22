@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Use this guide when the preview does not start cleanly or the object search workflow does not produce tracks.
+Use this guide when the runtime does not start cleanly or the object search workflow does not produce tracks.
 
 Start with the read-only preflight checks:
 
@@ -111,7 +111,7 @@ make restart
 
 ## Gazebo Or RViz Is Slow
 
-The preview uses software rendering for broad compatibility. It can be CPU-heavy.
+The runtime uses software rendering for broad compatibility. It can be CPU-heavy.
 
 Try:
 
@@ -193,7 +193,7 @@ Wait for Nav2 lifecycle nodes to become active, then retry from the object searc
 
 ## Clean Reset
 
-Stop detector and remove the preview container:
+Stop detector and remove the runtime container:
 
 ```bash
 make detector-stop

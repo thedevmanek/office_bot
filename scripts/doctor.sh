@@ -186,13 +186,13 @@ check_disk() {
 
   if ((available_kb < min_free_kb)); then
     fail "Only ${available_mb} MB free near ${REPO_ROOT}; expected at least ${min_free_mb} MB."
-    printf '      Free disk space before pulling the preview image.\n'
+    printf '      Free disk space before pulling the runtime image.\n'
   else
     pass "Disk space looks sufficient (${available_mb} MB free)"
   fi
 }
 
-printf 'OpenHRI Office preflight checks\n'
+printf 'OpenHRI preflight checks\n'
 printf 'Repository: %s\n' "${REPO_ROOT}"
 printf '\n'
 

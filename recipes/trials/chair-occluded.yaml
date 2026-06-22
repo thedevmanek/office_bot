@@ -1,0 +1,24 @@
+trial_id: chair-occluded
+scenario: object_search_approach
+world: office_world
+seed: 102
+template: true
+template_status: Template only; object spawn, occluder placement, and lab scoring are pending.
+
+robot:
+  start_pose:
+    x: -0.5
+    y: 0.3
+    yaw: 0.2
+
+target:
+  class: chair
+  pose:
+    x: 2.6
+    y: 1.6
+    yaw: 1.57
+  visibility: occluded
+  occluder: cubicle_wall
+
+operator_setup: Position a chair with partial occlusion near the declared pose; automated occluder placement is pending.
+notes: Template for testing partial visibility, delayed confirmation, and operator decisions around uncertain object memory.

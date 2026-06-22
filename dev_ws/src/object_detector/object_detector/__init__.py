@@ -1,0 +1,1 @@
+"""OpenHRI object detector package."""

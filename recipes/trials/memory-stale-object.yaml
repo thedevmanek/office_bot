@@ -1,0 +1,27 @@
+trial_id: memory-stale-object
+scenario: object_search_approach
+world: office_world
+seed: 105
+template: true
+template_status: Template only; stale-object relocation and lab scoring are pending.
+
+robot:
+  start_pose:
+    x: 0.0
+    y: 0.0
+    yaw: 0.0
+
+target:
+  class: bottle
+  pose:
+    x: 2.4
+    y: -0.8
+    yaw: 0.0
+  visibility: stale_memory
+  relocated_pose:
+    x: 1.4
+    y: 1.1
+    yaw: 0.0
+
+operator_setup: Start with the target at the declared pose, then relocate it to the relocated_pose during the run; automated relocation is pending.
+notes: Template for stale object memory where the UI should distinguish remembered and currently observed evidence.

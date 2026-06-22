@@ -35,6 +35,10 @@ CMakeLists.txt.user
 srv/_*.py
 *.pcd
 *.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 qtcreator-*
 *.user
 
@@ -49,6 +53,17 @@ qtcreator-*
 /dev_ws/install/*
 /dev_ws/log/*
 /dev_ws/build/*
+
+# Large local runtime assets and recordings.
+*.pth
+*.pt
+*.onnx
+*.engine
+*.bag
+*.db3
+*.mcap
+*.mp4
+*.mov
 
 # Catkin custom files
 CATKIN_IGNORE

@@ -1,0 +1,25 @@
+trial_id: bottle-tabletop
+scenario: object_search_approach
+world: office_world
+seed: 104
+template: true
+template_status: Template only; tabletop object spawn and lab scoring are pending.
+
+robot:
+  start_pose:
+    x: 0.2
+    y: -0.4
+    yaw: 0.1
+
+target:
+  class: bottle
+  pose:
+    x: 2.1
+    y: -0.9
+    z: 0.78
+    yaw: 0.0
+  visibility: tabletop
+  support_surface: office_table
+
+operator_setup: Place a COCO-recognizable bottle on the named support surface; automated tabletop spawning is pending.
+notes: Template for a small tabletop object where final stopping distance and camera angle matter.

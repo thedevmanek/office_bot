@@ -1,0 +1,23 @@
+trial_id: sofa-visible
+scenario: object_search_approach
+world: office_world
+seed: 103
+template: true
+template_status: Template only; object spawn and lab scoring are pending.
+
+robot:
+  start_pose:
+    x: -1.0
+    y: -0.5
+    yaw: 0.0
+
+target:
+  class: couch
+  pose:
+    x: 3.0
+    y: -1.4
+    yaw: 3.14
+  visibility: visible
+
+operator_setup: Use an existing couch-like target or place one near the declared pose; automated object spawning is pending.
+notes: Template for a visible sofa-like target; COCO names this class couch.

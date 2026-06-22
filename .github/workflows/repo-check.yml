@@ -1,0 +1,101 @@
+name: Repo checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/repo-check.yml"
+      - ".github/workflows/publish-runtime-image.yml"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".containerignore"
+      - ".dockerignore"
+      - ".gitattributes"
+      - ".gitignore"
+      - "CITATION.cff"
+      - "CONTRIBUTING.md"
+      - "Containerfile"
+      - "Makefile"
+      - "NOTICE"
+      - "README.md"
+      - "SECURITY.md"
+      - "compose.yaml"
+      - "docs/**"
+      - "container/**"
+      - "dev_ws/**"
+      - "recipes/trials/**"
+      - "scripts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  repo-check:
+    name: No-Podman repo check
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check Python syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          files = sorted(Path("scripts").glob("*.py"))
+          files.extend(sorted(Path("dev_ws/src").glob("**/*.py")))
+          for path in files:
+              compile(path.read_text(encoding="utf-8"), str(path), "exec")
+          print(f"python syntax ok: {len(files)} files")
+          PY
+
+      - name: Check shell syntax
+        run: |
+          find . \
+            -path './.git' -prune -o \
+            -path './.serena' -prune -o \
+            -path './dev_ws/build' -prune -o \
+            -path './dev_ws/install' -prune -o \
+            -path './dev_ws/log' -prune -o \
+            -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: Parse XML-like files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          skip = {".git", ".serena", "build", "install", "log", "__pycache__"}
+          suffixes = {".sdf", ".urdf", ".world", ".xacro", ".xml"}
+          files = []
+          for path in Path(".").rglob("*"):
+              if not path.is_file() or skip.intersection(path.parts):
+                  continue
+              if path.suffix.lower() in suffixes or path.name == "model.config":
+                  ET.parse(path)
+                  files.append(path)
+          print(f"xml ok: {len(files)} files")
+          PY
+
+      - name: Parse YAML metadata
+        run: |
+          ruby - <<'RUBY'
+          require "yaml"
+
+          skip = [".git", ".serena", "build", "install", "log", "__pycache__"]
+          files = Dir.glob("**/*.{yaml,yml,cff}", File::FNM_DOTMATCH).reject do |path|
+            path.split("/").any? { |part| skip.include?(part) }
+          end
+          files.each { |path| YAML.load_file(path) }
+          puts "yaml ok: #{files.length} files"
+          RUBY
+
+      - name: Run repo check
+        run: make repo-check

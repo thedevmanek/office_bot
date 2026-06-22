@@ -27,16 +27,16 @@ _openhri_prepend_path_env() {
 }
 
 if command -v ros2 >/dev/null 2>&1; then
-  OFFICE_BOT_MODEL_PREFIX="$(ros2 pkg prefix office_bot_model 2>/dev/null || true)"
-  if [[ -n "${OFFICE_BOT_MODEL_PREFIX}" ]]; then
-    OFFICE_BOT_MODEL_SHARE="${OFFICE_BOT_MODEL_PREFIX}/share/office_bot_model"
-    OFFICE_WORLD_MODELS="${OFFICE_BOT_MODEL_SHARE}/models/worlds/office_world/models"
+  OPENHRI_MODEL_PREFIX="$(ros2 pkg prefix office_bot_model 2>/dev/null || true)"
+  if [[ -n "${OPENHRI_MODEL_PREFIX}" ]]; then
+    OPENHRI_MODEL_SHARE="${OPENHRI_MODEL_PREFIX}/share/office_bot_model"
+    OFFICE_WORLD_MODELS="${OPENHRI_MODEL_SHARE}/models/worlds/office_world/models"
     _openhri_prepend_path_env GZ_SIM_RESOURCE_PATH "${OFFICE_WORLD_MODELS}"
     _openhri_prepend_path_env IGN_GAZEBO_RESOURCE_PATH "${OFFICE_WORLD_MODELS}"
     _openhri_prepend_path_env GZ_SIM_SYSTEM_PLUGIN_PATH /opt/ros/humble/lib
     _openhri_prepend_path_env IGN_GAZEBO_SYSTEM_PLUGIN_PATH /opt/ros/humble/lib
   fi
-  unset OFFICE_BOT_MODEL_PREFIX OFFICE_BOT_MODEL_SHARE OFFICE_WORLD_MODELS
+  unset OPENHRI_MODEL_PREFIX OPENHRI_MODEL_SHARE OFFICE_WORLD_MODELS
 fi
 
 if [[ "${_openhri_had_nounset}" == "1" ]]; then

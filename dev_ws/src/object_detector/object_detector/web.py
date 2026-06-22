@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 from ament_index_python.packages import get_package_share_directory
 
 
-class ObjectHuntWebServer:
+class ObjectSearchWebServer:
     def __init__(self, api, host, port, logger=None):
         self.api = api
         self.host = host
@@ -40,7 +40,7 @@ class ObjectHuntWebServer:
         api = self.api
         logger = self.logger
 
-        class ObjectHuntHandler(BaseHTTPRequestHandler):
+        class ObjectSearchHandler(BaseHTTPRequestHandler):
             def log_message(self, fmt, *args):
                 if logger is not None:
                     logger.debug(fmt % args)
@@ -117,7 +117,7 @@ class ObjectHuntWebServer:
                 self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
                 self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
-        return ObjectHuntHandler
+        return ObjectSearchHandler
 
     def _log(self, level, message):
         if self.logger is not None:

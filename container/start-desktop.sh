@@ -11,14 +11,14 @@ export QT_X11_NO_MITSHM="${QT_X11_NO_MITSHM:-1}"
 rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
 
 cat <<'EOF'
-OpenHRI Office container is starting.
+OpenHRI container is starting.
 
 noVNC: http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 Object UI, after starting detector node: http://localhost:8080/
 
 Inside the desktop, use the launchers:
-- OpenHRI-Office
-- OpenHRI-Object-UI
+- OpenHRI
+- OpenHRI Object UI
 EOF
 
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/openhri.conf

@@ -1,6 +1,7 @@
 """Manual YOLOX camera debugging script; not installed as a ROS module."""
 
 # flake8: noqa
+import os
 import time
 from pathlib import Path
 
@@ -11,8 +12,11 @@ from yolox.data.data_augment import ValTransform
 from yolox.exp import get_exp
 from yolox.utils import postprocess
 
-CKPT_PATH = Path(__file__).resolve().parents[1] / "resource" / "yolox_x.pth"
-CAM_INDEX = 2
+CHECKPOINT_DIR = Path(os.environ.get("OPENHRI_CHECKPOINT_DIR", "/opt/openhri/checkpoints"))
+CKPT_PATH = Path(
+    os.environ.get("OPENHRI_YOLOX_CHECKPOINT_PATH", CHECKPOINT_DIR / "yolox_x.pth")
+)
+CAM_INDEX = int(os.environ.get("OPENHRI_CAMERA_INDEX", "2"))
 
 COCO_CLASSES = (
     "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train",

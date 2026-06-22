@@ -99,7 +99,7 @@ COPY container/openhri-container-env.sh /etc/profile.d/openhri-container-env.sh
 COPY container/supervisord.conf /etc/supervisor/conf.d/openhri.conf
 
 RUN mkdir -p /root/Desktop
-COPY container/openhri-office.desktop /root/Desktop/OpenHRI-Office.desktop
+COPY container/openhri-office.desktop /root/Desktop/OpenHRI.desktop
 COPY container/openhri-object-ui.desktop /root/Desktop/OpenHRI-Object-UI.desktop
 
 RUN chmod +x /usr/local/bin/start-desktop.sh \
@@ -107,7 +107,7 @@ RUN chmod +x /usr/local/bin/start-desktop.sh \
     /usr/local/bin/start-object-detector.sh \
     /usr/local/bin/openhri-bootstrap-workspace \
     /etc/profile.d/openhri-container-env.sh \
-    /root/Desktop/OpenHRI-Office.desktop \
+    /root/Desktop/OpenHRI.desktop \
     /root/Desktop/OpenHRI-Object-UI.desktop
 
 RUN grep -qxF 'source /etc/profile.d/openhri-container-env.sh' /root/.bashrc \

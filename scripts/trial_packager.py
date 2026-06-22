@@ -6,7 +6,13 @@ import sys
 import zipfile
 from pathlib import Path
 
-from trial_runner import TrialError, load_simple_yaml, resolve_recipe_path
+from trial_runner import (
+    TRIAL_ID_RE,
+    TrialError,
+    assert_inside_repo,
+    load_simple_yaml,
+    resolve_recipe_path,
+)
 
 
 def main(argv=None):
@@ -16,6 +22,7 @@ def main(argv=None):
     try:
         trial_id = resolve_trial_id(repo_root, args.trial, args.recipe)
         run_dir = (repo_root / args.runs_dir / trial_id).resolve()
+        assert_inside_repo(repo_root, run_dir, "run directory")
         if not run_dir.exists():
             raise TrialError(f"run directory not found: {run_dir}")
 
@@ -44,13 +51,22 @@ def parse_args(argv):
 def resolve_trial_id(repo_root, trial, recipe):
     trial = trial.strip()
     if trial:
+        if not TRIAL_ID_RE.match(trial):
+            raise TrialError(
+                "trial_id may only contain letters, numbers, dash, underscore, and dot"
+            )
         return trial
     recipe = recipe.strip()
     if not recipe:
         raise TrialError("set TRIAL=<name> or RECIPE=<path>")
     recipe_path = resolve_recipe_path(repo_root, "", recipe)
     data = load_simple_yaml(recipe_path)
-    return str(data.get("trial_id") or recipe_path.stem)
+    trial_id = str(data.get("trial_id") or recipe_path.stem)
+    if not TRIAL_ID_RE.match(trial_id):
+        raise TrialError(
+            "trial_id may only contain letters, numbers, dash, underscore, and dot"
+        )
+    return trial_id
 
 
 def resolve_output(repo_root, output, runs_dir, trial_id):
@@ -71,12 +87,19 @@ def package_run(run_dir, output):
             + ", ".join(missing_required)
         )
 
-    useful = ["manifest.yaml", "events.jsonl"]
-    missing_useful = [name for name in useful if not (run_dir / name).exists()]
-    if missing_useful:
+    completed = ["manifest.yaml", "events.jsonl"]
+    missing_completed = [name for name in completed if not (run_dir / name).exists()]
+    if missing_completed:
         print(
             "trial_packager: warning: packaging before detector artifacts exist: "
-            + ", ".join(missing_useful),
+            + ", ".join(missing_completed),
+            file=sys.stderr,
+        )
+
+    if not missing_completed and not (run_dir / "evaluation.json").exists():
+        print(
+            "trial_packager: warning: completed detector artifacts exist but "
+            "evaluation.json is missing. Run make trial-evaluate before sharing.",
             file=sys.stderr,
         )
 
