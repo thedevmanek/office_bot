@@ -90,10 +90,10 @@ colcon test-result --verbose
 
 ### object_detector
 
-- Current node expects a YOLOX checkpoint at:
-  - `/home/thedevmanek/office_bot/dev_ws/src/object_detector/resource/yolox_m.pth`
+- Current node resolves YOLOX checkpoints from `OPENHRI_CHECKPOINT_DIR` or the package resource directory.
+  The container default is `/opt/openhri/checkpoints/yolox_x.pth`.
 - `coco.names` is versioned; model weights are not currently present in repo.
-- If changing detector paths, prefer package-relative resolution over hard-coded absolute paths.
+- If changing detector paths, keep them package-relative or environment-configurable.
 
 ## Agent Working Rules
 

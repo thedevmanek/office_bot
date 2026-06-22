@@ -1,0 +1,56 @@
+name: Trial recipe
+description: Propose a repeatable object-search recipe.
+title: "[Trial]: "
+labels:
+  - good first trial
+  - recipe
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this to propose a recipe for `recipes/trials/`. Mark it as a template if object spawning or evaluation is not automated yet.
+  - type: input
+    id: trial_id
+    attributes:
+      label: Trial ID
+      description: Filesystem-safe ID, for example chair-visible.
+    validations:
+      required: true
+  - type: input
+    id: target_class
+    attributes:
+      label: Target class
+      description: COCO class name or planned detector class.
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario
+      description: Object visibility, placement, occlusion, stale-memory setup, and operator role.
+    validations:
+      required: true
+  - type: textarea
+    id: recipe_yaml
+    attributes:
+      label: Draft recipe YAML
+      description: Paste the proposed YAML or the fields needed to write it.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: expected_metrics
+    attributes:
+      label: Expected metrics
+      description: Detection latency, localization error, navigation success, final stopping distance, interventions, or other run outcomes.
+  - type: dropdown
+    id: template_status
+    attributes:
+      label: Template status
+      options:
+        - Fully runnable
+        - Template only
+        - Needs object spawning support
+        - Needs evaluator support
+    validations:
+      required: true

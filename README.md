@@ -1,47 +1,65 @@
-# OpenHRI Office Simulation
+# OpenHRI
 
-OpenHRI Office Simulation is a containerized ROS 2 Humble demo for repeatable human-robot interaction research in office service environments.
+<p align="center">
+  <img src="docs/assets/openhri-wordmark.svg" alt="OpenHRI logo" width="520">
+</p>
 
-It starts a browser-accessible desktop with Gazebo, RViz, Nav2, SLAM, a reference mobile robot, YOLOX-X object detection, object localization, object memory, and a web console for selecting objects and requesting navigation.
+`office_bot` is the reference office-robot project inside OpenHRI. OpenHRI is the umbrella for open, inspectable human-robot interaction workflows; this repository packages the `office_bot` simulation, object-search workflow, ROS packages, run recipes, and hardware bringup path.
 
-This is the simulation branch. Raspberry Pi hardware bringup lives on the `hardware` branch.
+The point is to avoid sealed robot demos that become hard to maintain when vendor support or setup notes disappear. Teams should be able to run the stack, inspect it, swap parts, change behavior, and understand what happened from logs and run outputs.
 
-## What You Can Do
+The current `office_bot` public release focuses on the simulation and repeatable run workflow. Raspberry Pi hardware bringup is tracked separately on the `hardware` branch.
 
-- Run the full office simulation from a browser.
-- Watch the reference robot build a map and publish sensor data.
-- Detect everyday objects from the robot camera.
-- Localize confirmed objects with camera and lidar data.
-- Inspect object tracks in a web UI.
-- Send the robot to an approach pose near a selected object.
-- Modify detection, localization, navigation, UI, and study parameters.
+## What Works
 
-## Prerequisites
+- Browser-accessible Gazebo/RViz desktop.
+- ROS 2 Humble workspace with Nav2, SLAM, lidar, camera, and a reference mobile robot.
+- YOLOX object detection with object localization, object memory, markers, and a web operator console.
+- Repeatable object-search recipes under `recipes/trials/`.
+- Run outputs under `runs/<trial-id>/`, including recipe copies, summaries, manifests, JSONL events, evaluator output, and reproducibility packages when a live run is completed.
+
+## Demo Video
+
+[![office_bot object-search demo](docs/assets/media/office-bot-object-hunt-demo-poster.jpg)](docs/assets/media/office-bot-object-hunt-demo.mp4)
+
+The demo video shows the `office_bot` simulation, RViz view, object memory, and
+object-navigation request flow.
+
+## Early Hardware Prototype
+
+<p align="center">
+  <img src="docs/assets/media/office-bot-hardware-beta-v1.jpg" alt="office_bot early hardware prototype" width="640">
+</p>
+
+The early hardware prototype is assembled with onboard battery power, Raspberry
+Pi 5 plus Axelera compute, motor control, lidar, camera, mecanum drive, and a
+physical emergency stop on the left side of the robot.
+
+Current hardware status:
+
+- Onboard battery power works, with observed runtime of more than 10 hours.
+- Mecanum wheels and motor controller are wired and can move under command.
+- Low-speed motion has been tested through a raw motor-controller Python script.
+- Lidar and camera are mounted and producing usable ROS data.
+- Axelera acceleration hardware is installed and working.
+- Object detection, SLAM, and navigation remain simulation-first while full
+  robot-stack integration on the Raspberry Pi hardware is in progress.
+
+## Quickstart
+
+Prerequisites:
 
 - Podman with Compose support.
-- 8 GB or more free disk space for the published image and runtime data.
-- A machine with enough memory for Gazebo, RViz, Nav2, and PyTorch CPU inference.
-- On macOS, a running Podman machine:
+- 8 GB or more free disk space.
+- Enough memory for Gazebo, RViz, Nav2, and CPU PyTorch inference.
+
+On macOS, start the Podman machine first:
 
 ```bash
 podman machine start
 ```
 
-Apple Silicon macOS defaults to `linux/arm64`. Intel Linux and Windows users can run commands with:
-
-```bash
-OPENHRI_PLATFORM=linux/amd64
-```
-
-The supported runtime is Podman. The runtime image is published on GitHub Container Registry as:
-
-```text
-ghcr.io/thedevmanek/openhri-office:latest-preview
-```
-
-## Quickstart
-
-From the repository root:
+Start the container:
 
 ```bash
 make doctor
@@ -54,95 +72,100 @@ Open the noVNC desktop:
 http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 ```
 
-Launch the office simulation:
+Launch the simulation:
 
 ```bash
 make sim
 ```
 
-When Gazebo and RViz are running, start object detection in another terminal:
+Start object detection in another terminal:
 
 ```bash
 make detector
 ```
 
-Open the object search console:
+Open the object console:
 
 ```text
 http://localhost:8080/
 ```
 
-For a step-by-step walkthrough, use [docs/quickstart.md](docs/quickstart.md).
+Detailed setup is in [docs/quickstart.md](docs/quickstart.md).
 
-## Expected First Run
+## Run Workflow
 
-The first `make start` runs read-only preflight checks, pulls `ghcr.io/thedevmanek/openhri-office:latest-preview`, starts the container, mounts this checkout read-only, builds the mounted ROS workspace into named Podman volumes, and prints browser URLs. It does not build the image locally. Use `make start-local` when you intentionally want to build the runtime image from this checkout.
+Run a planned recipe without starting the detector:
 
-The runtime image contains ROS, Gazebo, RViz, Nav2, PyTorch, YOLOX, noVNC, startup scripts, and the YOLOX checkpoint. The repository checkout provides the ROS packages, launch files, world assets, object detector code, web UI, docs, and configs at runtime.
+```bash
+make trial-plan TRIAL=bottle-demo
+```
 
-After `make sim`, you should see:
+Run a recipe after `make sim` is active:
 
-- Gazebo/Ignition loading the office world.
-- The Office Bot robot spawned near the start pose.
-- RViz showing the robot, lidar data, map, and Nav2 views.
-- Nav2 lifecycle nodes becoming active after the map and transforms settle.
+```bash
+make trial TRIAL=bottle-demo
+```
 
-After `make detector`, you should see:
+`bottle-demo` records the declared target pose and setup notes, but it does not
+spawn a bottle automatically. Confirm the target setup in
+`recipes/trials/bottle-demo.yaml` before treating a run as complete.
 
-- Detector logs streaming in your terminal.
-- The object search console at `http://localhost:8080/`.
-- Confirmed object cards once detections are stable.
+Evaluate and package a completed run:
+
+```bash
+make trial-evaluate TRIAL=bottle-demo
+make trial-pack TRIAL=bottle-demo
+```
+
+For a supervised session with simulation logs, detector logs, container logs, and run outputs in one tmux layout:
+
+```bash
+make workflow-session
+```
+
+Use [docs/workflow-guide.md](docs/workflow-guide.md) for the expected run loop and output package.
 
 ## Common Commands
 
 ```bash
-make help           # Show simulation commands
-make doctor         # Check Podman, platform, ports, and disk space
-make start          # Pull runtime, mount source, and bootstrap workspace
-make start-cached   # Run the cached image without pulling
-make start-local    # Build the runtime image locally and run it
-make bootstrap      # Rebuild the mounted ROS workspace
-make test           # Rebuild and run package tests inside the container
-make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
-make researcher-session  # Recreate a 2x2 tmux split grid for logs and artifacts
-make detector       # Start/restart object detection and stream logs
-make detector-bg    # Start/restart detection without following logs
-make detector-logs  # Follow detector logs
-make detector-stop  # Stop the detector process
-make shell          # Open a ROS-ready shell in the container
-make urls           # Print browser URLs
-make restart        # Pull and recreate the runtime preview container
-make restart-local  # Build the runtime image locally and recreate the preview
-make down           # Stop and remove the preview container
-make clean-volumes  # Remove cached build/install/log volumes
+make help        # Show available commands
+make repo-check  # Check links, docs, recipes, and helper scripts without Podman
+make doctor      # Check Podman, platform, ports, and disk space
+make start       # Pull runtime, mount source, and bootstrap workspace
+make sim         # Launch Gazebo, RViz, SLAM, Nav2, and the robot
+make detector    # Start object detection and stream logs
+make test        # Run ROS package tests inside the container
+make shell       # Open a ROS-ready shell in the container
+make down        # Stop and remove the container
 ```
 
-## Troubleshooting
+Intel Linux and Intel Windows users can select the platform explicitly:
 
-- Run `make doctor` for read-only preflight checks and exact fix commands.
-- If `make start` cannot connect to Podman on macOS, run `podman machine start` and retry.
-- If ports are already in use, override them, for example `OPENHRI_NOVNC_PORT=6081 OPENHRI_OBJECT_UI_PORT=8081 make start`.
-- If Gazebo reports `Unable to find uri[model://...]`, recreate the container with `make restart`; the simulation launch also sets the model path at runtime.
-- If you changed source under `dev_ws/`, run `make bootstrap` before launching again.
-- If the detector cannot find the YOLOX checkpoint, run `make checkpoint`.
-- If the UI shows no objects, keep Gazebo and the detector running, confirm `/camera/image_raw` is publishing, and place a COCO-class object in view.
+```bash
+OPENHRI_PLATFORM=linux/amd64 make start
+```
 
-More detail is in [docs/troubleshooting.md](docs/troubleshooting.md).
+If ports are already in use:
+
+```bash
+OPENHRI_NOVNC_PORT=6081 OPENHRI_OBJECT_UI_PORT=8081 make start
+```
 
 ## Project Layout
 
 ```text
 dev_ws/
-  launch_sim.sh
   src/
     office_bot_model/                 Robot model, office world, launch, Nav2, RViz
     office_bot_controller_handlers/   Controller helper nodes
     object_detector/                  Detection, localization, tracking, web UI
-container/                            Desktop, detector, checkpoint, and shell scripts
-docs/                                 Quickstart, task guide, study notes, troubleshooting
+container/                           Runtime image scripts and desktop launchers
+recipes/trials/                      Repeatable object-search recipes
+scripts/                             Checks, trial runner, evaluator, packager, tmux session
+docs/                                Operational docs
 ```
 
-Common object-search tuning points:
+Common tuning files:
 
 - `dev_ws/src/object_detector/config/object_detector.yaml`
 - `dev_ws/src/object_detector/object_detector/localization.py`
@@ -150,53 +173,27 @@ Common object-search tuning points:
 - `dev_ws/src/object_detector/object_detector/navigation.py`
 - `dev_ws/src/object_detector/web/index.html`
 
-## Researcher Workflow
+## Docs
 
-Use [docs/researcher-guide.md](docs/researcher-guide.md) when sharing the
-project with researchers who need to evaluate, modify, or package studies.
-
-The recommended validation path is:
-
-```bash
-make doctor
-make start
-make researcher-session
-make trial-pack TRIAL=bottle-demo
-```
-
-`make researcher-session` opens one tmux `run` window split into a 2x2 grid:
-simulation and detector on the left, container logs and run artifacts on the
-right. It replaces any stale `openhri` tmux session instead of reusing old
-layouts. Mouse scrolling is enabled. Use `Ctrl-b` then `X` or `F12` to stop the
-simulation, detector, and tmux session. Use `make researcher-attach` only when
-you intentionally want to reattach to the existing session, and
-`make researcher-stop` to stop from a normal terminal.
-If a pane command exits or fails, that pane stays open at a shell prompt; type
-`rerun` in the pane to execute the same command again.
-
-Most study changes should start by copying a recipe in `experiments/trials/`
-and validating it with the preview container running:
-
-```bash
-make trial-plan TRIAL=<trial-id>
-make test
-```
-
-## Documentation
-
-- [Quickstart](docs/quickstart.md): shortest path to a working demo.
-- [Container quickstart](docs/container-quickstart.md): image, ports, platform, and operations notes.
-- [Researcher guide](docs/researcher-guide.md): trial recipes, tinker points, artifacts, and validation.
-- [Reproducibility](docs/reproducibility.md): recipe-backed runs, manifests, logs, and packaging.
-- [Runtime image release](docs/runtime-image-release.md): GHCR publishing and tag policy.
-- [Object Search and Approach](docs/object-search-and-approach.md): the primary research task.
-- [Troubleshooting](docs/troubleshooting.md): common setup and runtime problems.
-- [Demo script](docs/demo-script.md): suggested 60 to 90 second demo structure.
-- [Study ideas](docs/study-ideas): HRI study directions built on the same task.
+- [Quickstart](docs/quickstart.md)
+- [Container quickstart](docs/container-quickstart.md)
+- [Workflow guide](docs/workflow-guide.md)
+- [Object Search and Approach](docs/object-search-and-approach.md)
+- [Reproducibility](docs/reproducibility.md)
+- [Logging spec](docs/logging-spec.md)
+- [Asset attribution and license review](docs/asset-attribution.md)
+- [Visual media guide](docs/visual-media-guide.md)
+- [Preview release notes](docs/preview-release-notes.md)
+- [Hardware BOM](docs/hardware-bom.md)
+- [Hardware readiness checklist](docs/hardware-readiness-checklist.md)
+- [Component swap guide](docs/component-swap-guide.md)
+- [Runtime image release](docs/runtime-image-release.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Security policy](SECURITY.md)
 
 ## Native ROS 2 Workflow
 
-The container path is the recommended handoff path. For native Ubuntu 22.04 / ROS 2 Humble development:
+The container path is the recommended workflow. For native Ubuntu 22.04 / ROS 2 Humble development:
 
 ```bash
 cd dev_ws
@@ -206,14 +203,14 @@ source install/local_setup.bash
 ./launch_sim.sh
 ```
 
-Targeted builds:
+## Project Status
 
-```bash
-colcon build --symlink-install --packages-select office_bot_model
-colcon build --symlink-install --packages-select office_bot_controller_handlers
-colcon build --symlink-install --packages-select object_detector
-```
+The current public release covers the simulation and recipe-backed workflow.
+Physical robot deployment is outside the scope of this branch until the hardware
+readiness documentation records completed subsystem evidence. Bundled
+Gazebo/Ignition world assets have separate attribution and redistribution
+limits described in [docs/asset-attribution.md](docs/asset-attribution.md).
 
 ## License
 
-OpenHRI Office Simulation is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+OpenHRI `office_bot` source code is licensed under the Apache License 2.0. See [LICENSE](LICENSE). The root [NOTICE](NOTICE) records the license boundary for bundled Gazebo/Ignition world assets, which include third-party model metadata and require the separate review described in [docs/asset-attribution.md](docs/asset-attribution.md).

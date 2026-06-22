@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a setup, runtime, detector, UI, trial, or documentation bug.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when documented behavior does not work. Include commands, logs, and artifacts where possible.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - setup / container
+        - Gazebo / RViz / Nav2
+        - object detection / localization
+        - object UI
+        - trial recipes / artifacts
+        - documentation
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and why it seems wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did the docs, command output, or UI imply should happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include exact commands such as make doctor, make start, make sim, or make trial-plan.
+      placeholder: |
+        1. Run ...
+        2. Open ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or artifacts
+      description: Paste relevant logs or attach run artifacts. Remove secrets and private data.
+      render: shell
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or release
+      description: Commit SHA, branch, or release tag where this happened.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, CPU architecture, Podman version, and any port/platform overrides.

@@ -53,7 +53,7 @@ def test_run_manifest_writer_writes_yaml_with_artifact_links(tmp_path):
     event_log_path = tmp_path / "events.jsonl"
     env = {
         "OPENHRI_PLATFORM": "linux/arm64",
-        "OPENHRI_IMAGE": "ghcr.io/example/openhri:preview",
+        "OPENHRI_IMAGE": "ghcr.io/example/openhri-office:preview",
         "OPENHRI_DETECTOR_PARAMS": "/workspace/dev_ws/config.yaml",
         "OPENHRI_DETECTOR_PARAM_ARGS": "--params-file base --params-file trial",
         "ROS_DISTRO": "humble",
@@ -76,7 +76,7 @@ def test_run_manifest_writer_writes_yaml_with_artifact_links(tmp_path):
     text = writer.path.read_text(encoding="utf-8")
     assert 'run_id: "run-001"' in text
     assert 'trial_id: "trial-001"' in text
-    assert 'image: "ghcr.io/example/openhri:preview"' in text
+    assert 'image: "ghcr.io/example/openhri-office:preview"' in text
     assert 'event_log_path: "' in text
     assert 'trial_recipe_path: "/workspace/openhri-office/runs/trial-001/recipe.yaml"' in text
     assert 'run_dir: "/workspace/openhri-office/runs/trial-001"' in text

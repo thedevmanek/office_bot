@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">OpenHRI wordmark</title>
+  <desc id="desc">OpenHRI wordmark with robot and human-interaction mark.</desc>
+  <defs>
+    <linearGradient id="core" x1="40" x2="200" y1="40" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#19c2ff"/>
+      <stop offset="0.48" stop-color="#2ed47a"/>
+      <stop offset="1" stop-color="#f4b740"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="240" rx="28" fill="#ffffff"/>
+  <g transform="translate(32 32)">
+    <rect width="176" height="176" rx="38" fill="#0f1720"/>
+    <path fill="none" stroke="#233242" stroke-linecap="round" stroke-width="7" d="M42 127c17 13 35 19 55 18 23-1 42-11 57-31M34 53c17-13 36-20 56-20 24 0 44 8 61 25"/>
+    <circle cx="40" cy="54" r="9" fill="#19c2ff"/>
+    <circle cx="153" cy="115" r="9" fill="#f4b740"/>
+    <path fill="url(#core)" d="M58 65c0-10 8-18 18-18h24c10 0 18 8 18 18v14h14c8 0 14 6 14 14v31c0 8-6 14-14 14H44c-8 0-14-6-14-14V93c0-8 6-14 14-14h14V65Zm18-5c-3 0-5 2-5 5v14h34V65c0-3-2-5-5-5H76Z"/>
+    <path fill="#0f1720" d="M51 93h18v29H58v-9h-7v9H40V93h11v9h7v-9Zm31 0h22c8 0 13 4 13 11 0 5-2 8-6 10l8 8h-13l-7-7h-5v7H82V93Zm12 10v5h8c2 0 3-1 3-3 0-1-1-2-3-2h-8Zm29-10h12v29h-12V93Z"/>
+    <circle cx="63" cy="46" r="6" fill="#2ed47a"/>
+    <circle cx="113" cy="46" r="6" fill="#2ed47a"/>
+  </g>
+  <text x="244" y="110" fill="#0f1720" font-family="Inter, Avenir Next, Helvetica, Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="0">OpenHRI</text>
+  <text x="248" y="152" fill="#435363" font-family="Inter, Avenir Next, Helvetica, Arial, sans-serif" font-size="24" font-weight="500" letter-spacing="0">open human-robot interaction stack</text>
+  <path fill="none" stroke="#19c2ff" stroke-linecap="round" stroke-width="8" d="M674 146h52"/>
+  <path fill="none" stroke="#2ed47a" stroke-linecap="round" stroke-width="8" d="M744 146h52"/>
+  <path fill="none" stroke="#f4b740" stroke-linecap="round" stroke-width="8" d="M814 146h52"/>
+</svg>

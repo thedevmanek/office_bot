@@ -1,0 +1,23 @@
+trial_id: chair-visible
+scenario: object_search_approach
+world: office_world
+seed: 101
+template: true
+template_status: Template only; object spawn and lab scoring are pending.
+
+robot:
+  start_pose:
+    x: 0.0
+    y: 0.0
+    yaw: 0.0
+
+target:
+  class: chair
+  pose:
+    x: 2.0
+    y: 1.2
+    yaw: 0.0
+  visibility: visible
+
+operator_setup: Use an existing visible chair or place one near the declared pose; automated object spawning is pending.
+notes: Template for a visible chair search with a direct camera approach opportunity.

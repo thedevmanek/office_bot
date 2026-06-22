@@ -23,7 +23,7 @@ from object_detector.run_manifest import (
     run_manifest_config_from_params,
 )
 from object_detector.tracking import TrackManager, footprint_points
-from object_detector.web import ObjectHuntWebServer
+from object_detector.web import ObjectSearchWebServer
 
 
 class ObjectDetectionNode(Node):
@@ -83,7 +83,7 @@ class ObjectDetectionNode(Node):
         self._create_ros_interfaces()
         if not self.detector.load():
             self._set_status("model_unavailable", self.detector.status_message)
-        self.web_server = ObjectHuntWebServer(
+        self.web_server = ObjectSearchWebServer(
             self,
             self.params["web_host"],
             int(self.params["web_port"]),
@@ -666,22 +666,29 @@ class ObjectDetectionNode(Node):
         return self.navigator.navigate_to_track(track)
 
     def _set_status(self, state, message, track_id=None):
+        track_class = None
         with self.state_lock:
             previous_status = self.nav_status.as_dict()
             status = NavigationStatus(state=state, message=message, track_id=track_id)
             self.nav_status = status
+            if track_id is not None:
+                track = self.tracks.tracks.get(track_id)
+                if track is not None:
+                    track_class = track.class_name
         if (
             state in ("succeeded", "error")
             and track_id is not None
             and previous_status != status.as_dict()
         ):
+            fields = {
+                "track_id": track_id,
+                "class": track_class,
+                "status": state,
+                "message": message,
+            }
             self._log_event(
                 "navigation_result",
-                {
-                    "track_id": track_id,
-                    "status": state,
-                    "message": message,
-                },
+                fields,
             )
 
     def _log_object_localized(

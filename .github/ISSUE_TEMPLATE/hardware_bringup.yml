@@ -1,0 +1,61 @@
+name: Hardware bringup
+description: Propose, test, or document a hardware subsystem.
+title: "[Hardware]: "
+labels:
+  - hardware-bringup
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for hardware work that makes OpenHRI easier to build, inspect, repair, or adapt.
+  - type: dropdown
+    id: subsystem
+    attributes:
+      label: Subsystem
+      options:
+        - chassis
+        - motor control
+        - odometry
+        - lidar
+        - camera
+        - battery
+        - emergency stop
+        - compute
+        - wiring
+        - Nav2 hardware bringup
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: current_status
+    attributes:
+      label: Current status
+      description: What exists now, and what files, photos, logs, or measurements support it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_change
+    attributes:
+      label: Proposed change or test
+      description: Define the build, replacement, calibration, or safety check precisely enough for another team to repeat.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What exact result counts as ready for shared hardware use?
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risk
+      description: Safety, hardware damage, reliability, cost, supply, or maintenance risks.
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Supporting files
+      description: Logs, photos, videos, bag files, measurements, BOM updates, or run packages. Remove private data.

@@ -1,0 +1,17 @@
+OpenHRI office_bot
+
+This repository contains `office_bot`, the reference office-robot project within
+OpenHRI.
+
+Source code, documentation, helper scripts, and configuration authored for this
+repository are distributed under the Apache License 2.0. See LICENSE.
+
+The repository also includes bundled Gazebo/Ignition simulation world assets
+under dev_ws/src/office_bot_model/models/worlds/office_world/. Those model,
+mesh, texture, animation, material, and shared media files carry third-party
+authorship metadata where available and are not relicensed by the Apache-2.0
+project license.
+
+Before reusing, redistributing, or repackaging those simulation assets outside
+this repository, review the local metadata and the current attribution status in
+docs/asset-attribution.md.

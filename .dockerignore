@@ -2,9 +2,14 @@
 .serena/cache
 .serena/logs
 .serena/project.local.yml
+build
+devel
+logs
 dev_ws/build
 dev_ws/install
 dev_ws/log
+runs/*
+!runs/.gitignore
 **/__pycache__
 **/*.pyc
 **/.pytest_cache
@@ -19,3 +24,5 @@ dev_ws/log
 *.mcap
 *.mp4
 *.mov
+*.zip
+.DS_Store

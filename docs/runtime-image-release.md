@@ -1,6 +1,6 @@
 # Runtime Image Release
 
-The OpenHRI Office image is a runtime base. It contains ROS 2 Humble, Gazebo/Ignition, RViz, Nav2, SLAM Toolbox, YOLOX, noVNC, startup scripts, bootstrap tooling, and the YOLOX checkpoint.
+The OpenHRI `office_bot` image is a runtime base. It contains ROS 2 Humble, Gazebo/Ignition, RViz, Nav2, SLAM Toolbox, YOLOX, noVNC, startup scripts, bootstrap tooling, and the YOLOX checkpoint.
 
 It does not contain the project workspace. At runtime, `compose.yaml` mounts this repository read-only at:
 
@@ -24,7 +24,7 @@ The default published runtime image is:
 ghcr.io/thedevmanek/openhri-office:latest-preview
 ```
 
-Historical or versioned tags are not published by this workflow.
+The image name still uses the original package path for compatibility with the published runtime. Historical or versioned tags are not published by this workflow.
 
 ## Publishing
 

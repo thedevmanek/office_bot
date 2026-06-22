@@ -1,6 +1,6 @@
 # Quickstart
 
-This guide takes you from a clean checkout to a running OpenHRI Office simulation with object detection and the object search console.
+This guide takes you from a clean checkout to a running OpenHRI `office_bot` simulation with object detection and the object search console.
 
 Use the commands from the repository root unless a step says otherwise.
 
@@ -14,7 +14,7 @@ podman machine start
 
 Linux users usually do not need this step.
 
-## 2. Pull And Start The Preview Container
+## 2. Pull And Start The Runtime Container
 
 ```bash
 make doctor
@@ -32,10 +32,10 @@ http://localhost:6080/vnc.html?autoconnect=1&resize=remote
 Expected result:
 
 - A browser-based Linux desktop opens.
-- Desktop launchers are available for OpenHRI Office and the object UI.
+- Desktop launchers are available for OpenHRI and the object UI.
 - `make ps` shows the `openhri-office` container running.
 
-## 3. Launch The Office Simulation
+## 3. Launch The Simulation
 
 In a terminal on your host machine:
 
@@ -52,7 +52,7 @@ Expected result:
 - The robot appears in both Gazebo and RViz.
 - Logs eventually show Nav2 managed nodes becoming active.
 
-You can also launch the same simulation from the noVNC desktop by opening **OpenHRI Office**.
+You can also launch the same simulation from the noVNC desktop by opening **OpenHRI**.
 
 ## 4. Start Object Detection
 
@@ -87,7 +87,7 @@ Expected result:
 
 ## 6. Run The Demo Task
 
-Use [Object Search and Approach](object-search-and-approach.md) as the demo script:
+Use [Object Search and Approach](object-search-and-approach.md) as the task walkthrough:
 
 1. Start the simulation with `make sim`.
 2. Start detection with `make detector`.
@@ -134,7 +134,7 @@ Stop the detector:
 make detector-stop
 ```
 
-Stop and remove the preview container:
+Stop and remove the runtime container:
 
 ```bash
 make down

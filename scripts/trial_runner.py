@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 
 
 CONTAINER_REPO_ROOT = PurePosixPath("/workspace/openhri-office")
-DEFAULT_IMAGE = "ghcr.io/thedevmanek/openhri-office:0.1.0-preview"
+DEFAULT_IMAGE = "ghcr.io/thedevmanek/openhri-office:latest-preview"
 DEFAULT_DETECTOR_PARAMS = (
     "/workspace/openhri-office/dev_ws/src/object_detector/config/"
     "object_detector.yaml"
@@ -56,19 +56,21 @@ def main(argv=None):
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(
-        description="Run an OpenHRI object-search trial recipe."
+        description="Run an OpenHRI object-search recipe."
     )
-    parser.add_argument("--trial", default="", help="Trial name in experiments/trials")
+    parser.add_argument("--trial", default="", help="Trial name in recipes/trials")
     parser.add_argument("--recipe", default="", help="Explicit recipe YAML path")
     parser.add_argument("--runs-dir", default="runs", help="Host run output directory")
     parser.add_argument("--container", default="openhri-office")
-    parser.add_argument("--image", default=os.environ.get("OPENHRI_IMAGE", DEFAULT_IMAGE))
+    parser.add_argument(
+        "--image",
+        default=os.environ.get("OPENHRI_IMAGE", DEFAULT_IMAGE),
+    )
     parser.add_argument(
         "--platform",
         default=os.environ.get("OPENHRI_PLATFORM", "linux/arm64"),
     )
     parser.add_argument("--detector-params", default=DEFAULT_DETECTOR_PARAMS)
-    parser.add_argument("--detector-log", default="")
     parser.add_argument(
         "--no-start",
         action="store_true",
@@ -91,7 +93,7 @@ def resolve_recipe_path(repo_root, trial_name, recipe):
     if not trial_name:
         raise TrialError("set TRIAL=<name> or RECIPE=<path>")
 
-    path = repo_root / "experiments" / "trials" / f"{trial_name}.yaml"
+    path = repo_root / "recipes" / "trials" / f"{trial_name}.yaml"
     if not path.exists():
         raise TrialError(f"trial recipe not found: {path}")
     return path.resolve()
@@ -204,6 +206,12 @@ def normalize_trial(recipe, trial_name, recipe_path):
     if missing:
         raise TrialError(f"recipe is missing required field(s): {', '.join(missing)}")
 
+    notes = str(recipe.get("notes") or "")
+    operator_setup = str(recipe.get("operator_setup") or "")
+    if operator_setup:
+        setup_note = f"Operator setup: {operator_setup}"
+        notes = f"{notes} {setup_note}".strip()
+
     return {
         "trial_id": trial_id,
         "scenario": str(recipe.get("scenario") or "object_search_approach"),
@@ -212,7 +220,8 @@ def normalize_trial(recipe, trial_name, recipe_path):
         "robot_start_pose": pose_to_param(start_pose),
         "target_class": str(target_class),
         "target_object_pose": pose_to_param(target_pose),
-        "notes": str(recipe.get("notes") or ""),
+        "notes": notes,
+        "operator_setup": operator_setup,
     }
 
 
@@ -247,6 +256,7 @@ def prepare_run(repo_root, recipe_path, trial, runs_dir):
     recipe_copy = run_dir / "recipe.yaml"
     if recipe_path.resolve() != recipe_copy.resolve():
         shutil.copyfile(recipe_path, recipe_copy)
+    reset_run_artifacts(run_dir)
 
     rel_run_dir = run_dir.relative_to(repo_root)
     container_run_dir = CONTAINER_REPO_ROOT / rel_run_dir.as_posix()
@@ -260,6 +270,13 @@ def prepare_run(repo_root, recipe_path, trial, runs_dir):
         "container_params": container_run_dir / "detector_params.yaml",
         "container_log": container_run_dir / "detector.log",
     }
+
+
+def reset_run_artifacts(run_dir):
+    for name in ("events.jsonl", "manifest.yaml", "detector.log", "evaluation.json"):
+        path = run_dir / name
+        if path.exists():
+            path.unlink()
 
 
 def assert_inside_repo(repo_root, path, label):
@@ -350,6 +367,8 @@ def write_summary(run, trial, status, no_start):
         f"  target_class: {trial['target_class']}",
         f"  target_object_pose: {trial['target_object_pose']}",
     ]
+    if trial["operator_setup"]:
+        lines.extend(["", "operator_setup:", f"  {trial['operator_setup']}"])
     if trial["notes"]:
         lines.extend(["", "notes:", f"  {trial['notes']}"])
     (run["host_dir"] / "summary.txt").write_text(

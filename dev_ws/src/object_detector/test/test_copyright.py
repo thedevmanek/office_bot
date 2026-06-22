@@ -16,8 +16,9 @@ from ament_copyright.main import main
 import pytest
 
 
-# Remove the `skip` decorator once the source file(s) have a copyright header
-@pytest.mark.skip(reason='No copyright header has been placed in the generated source file.')
+# Apache-2.0 is declared at the repository and package level. Per-file
+# copyright header enforcement is intentionally deferred for this release.
+@pytest.mark.skip(reason='Per-file copyright header enforcement is deferred.')
 @pytest.mark.copyright
 @pytest.mark.linter
 def test_copyright():

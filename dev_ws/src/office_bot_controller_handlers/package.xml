@@ -2,21 +2,14 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>office_bot_controller_handlers</name>
-  <version>0.0.0</version>
-  <description>This package contains handlers for all the required controllers with easy to use
-    functions</description>
+  <version>0.1.0</version>
+  <description>OpenHRI controller helper nodes for stamped velocity and controller-facing behavior</description>
   <maintainer email="thedevmanek@gmail.com">thedevmanek</maintainer>
   <license>Apache-2.0</license>
 
 
-  <!-- Dependencies -->
   <depend>rclcpp</depend>
-  <depend>rclcpp_action</depend>
-  <depend>trajectory_msgs</depend>
-  <depend>control_msgs</depend>
-  <exec_depend>nav_msgs</exec_depend>
-  <exec_depend>tf2</exec_depend>
-  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <depend>geometry_msgs</depend>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

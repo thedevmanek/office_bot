@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use OpenHRI office_bot in demos, evaluations, prototypes, or published work, please cite this software."
+title: "OpenHRI office_bot"
+type: software
+authors:
+  - alias: "thedevmanek"
+repository-code: "https://github.com/thedevmanek/office_bot"
+url: "https://github.com/thedevmanek/office_bot"
+abstract: "The office_bot reference project within OpenHRI: an open-source ROS 2 office robot stack with simulation, object search, repeatable run recipes, and a transparent hardware bringup path."
+keywords:
+  - "robotics"
+  - "ROS 2"
+  - "object search"
+  - "simulation"
+  - "service robot"
+license: "Apache-2.0"
+version: "0.1.0-preview"
+date-released: "2026-06-21"

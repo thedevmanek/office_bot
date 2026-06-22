@@ -1,0 +1,57 @@
+name: Workflow example proposal
+description: Propose a reusable scenario, operator exercise, demo, or evaluation workflow.
+title: "[Workflow]: "
+labels:
+  - workflow
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this to turn a workflow idea into a concrete OpenHRI scenario or recipe.
+  - type: input
+    id: audience
+    attributes:
+      label: Audience or use case
+      description: "Example: robotics demo, navigation tuning, perception evaluation, hardware checkout, operator onboarding."
+    validations:
+      required: true
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals
+      description: What should the run prove, inspect, or improve?
+    validations:
+      required: true
+  - type: textarea
+    id: activity
+    attributes:
+      label: Proposed activity
+      description: Describe the task, expected commands, robot behavior, outputs, and time budget.
+    validations:
+      required: true
+  - type: dropdown
+    id: focus
+    attributes:
+      label: Primary focus
+      options:
+        - simulation and ROS 2 basics
+        - navigation and SLAM
+        - perception and object tracking
+        - controls and kinematics
+        - embedded bringup
+        - mechanical design
+        - electronics and power
+        - multi-robot operation
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: needed_changes
+    attributes:
+      label: Needed project changes
+      description: Docs, recipes, hardware notes, UI changes, evaluator changes, or ROS changes required.
+  - type: textarea
+    id: review
+    attributes:
+      label: Review criteria
+      description: What should a reviewer inspect or compare?

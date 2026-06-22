@@ -1,21 +1,21 @@
 # Object Search And Approach
 
-Object Search and Approach is the primary OpenHRI Office research task. It demonstrates a complete HRI-relevant robot loop: detect an everyday object, localize it in the world, expose the robot's belief state to a human, and navigate to a useful stand-off pose.
+Object Search and Approach is the primary `office_bot` workflow inside OpenHRI. It demonstrates a complete robot loop: detect an everyday object, localize it in the world, expose the robot's state to an operator, and navigate to a useful stand-off pose.
 
 ## Demo Goal
 
-Show that a researcher can run a repeatable office scenario where a mobile robot:
+Show that an operator can run a repeatable office scenario where a mobile robot:
 
 1. Sees an object.
 2. Estimates where that object is in the map.
 3. Remembers the object as a track.
-4. Shows the track to a human operator.
+4. Shows the track to an operator.
 5. Accepts a navigation request.
-6. Approaches the object and stops at a safe offset.
+6. Approaches the object and stops at a configured offset.
 
 ## Run The Task
 
-Start the preview container:
+Start the container:
 
 ```bash
 make start
@@ -32,6 +32,10 @@ Start object detection in another terminal:
 ```bash
 make trial TRIAL=bottle-demo
 ```
+
+The baseline recipe records the target pose and setup notes, but it does not
+spawn the object. Put a COCO-recognizable bottle in the robot camera view or at
+the declared target pose before treating the run as a completed trial.
 
 Open the object search console:
 
@@ -74,7 +78,7 @@ In the object search console:
 5. A confirmed object track is created after repeated observations.
 6. Markers and object obstacle clouds are published.
 7. The web UI exposes object class, track id, location, and robot status.
-8. A researcher or operator requests navigation to the tracked object.
+8. An operator requests navigation to the tracked object.
 9. Nav2 evaluates reachable approach options.
 10. The robot navigates to a stand-off pose and stops.
 
@@ -103,7 +107,7 @@ ros2 topic echo /detected_objects_markers --once
 ros2 topic echo /detected_object_obstacles --once
 ```
 
-## What Researchers Can Modify
+## What Operators Can Modify
 
 - Target object class.
 - Detector confidence threshold.
@@ -130,7 +134,7 @@ dev_ws/src/object_detector/web/index.html
 A compact repeatable trial can use:
 
 1. Target class, such as `chair`, `bottle`, or `backpack`.
-2. Fixed object placement.
+2. Fixed object placement notes.
 3. Fixed robot start pose.
 4. Detector and tracking enabled.
 5. Confirmed object track in the UI.
@@ -138,7 +142,7 @@ A compact repeatable trial can use:
 7. Final distance and outcome label.
 8. Reset before the next run.
 
-## Research Signals
+## Signals
 
 Core signals:
 
@@ -151,16 +155,13 @@ Core signals:
 - Number of operator interventions.
 - Final outcome label.
 
-HRI signals:
+Review signals:
 
-- Operator confidence in the robot's displayed state.
-- Perceived clarity of status messages.
-- Perceived safety of final approach.
-- Perceived robot competence.
+- Did the operator explain the sensor and topic path?
+- Did the configuration change produce the expected behavior?
+- Did the run package contain enough output to debug failures?
+- Did the operator document manual interventions?
 
 ## Event Logging
 
-Use [reproducibility.md](reproducibility.md) for recipe-backed trials that
-write one run folder containing the recipe, manifest, event log, summary, and
-reproduction script. Use [logging-spec.md](logging-spec.md) for the lower-level
-event schema.
+Use [reproducibility.md](reproducibility.md) for recipe-backed trials that write one run folder containing the recipe, manifest, event log, summary, and reproduction script. After a live run, `make trial-evaluate TRIAL=<trial-id>` writes `evaluation.json` with timing, target-match, navigation, terminal-status, and warning fields. Use [logging-spec.md](logging-spec.md) for the lower-level event schema.

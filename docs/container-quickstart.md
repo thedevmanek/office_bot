@@ -1,6 +1,6 @@
 # Container Quickstart
 
-The OpenHRI Office container is the recommended way to run and share the simulation preview. It packages ROS 2 Humble, Gazebo/Ignition, RViz, Nav2, SLAM Toolbox, YOLOX-X, noVNC, and the runtime scripts behind a small set of Podman commands. The repository checkout is mounted into the runtime container when you start it.
+The OpenHRI `office_bot` container is the recommended way to run and share the simulation workflow. It packages ROS 2 Humble, Gazebo/Ignition, RViz, Nav2, SLAM Toolbox, YOLOX-X, noVNC, and the runtime scripts behind a small set of Podman commands. The repository checkout is mounted into the runtime container when you start it.
 
 ## Start
 
@@ -100,25 +100,25 @@ make start-local    # Build the runtime image locally and run it
 make bootstrap      # Rebuild the mounted ROS workspace
 make test           # Rebuild and run package tests inside the container
 make sim            # Launch Gazebo, RViz, SLAM, Nav2, and the robot
-make researcher-session  # Recreate a 2x2 tmux split grid for logs and artifacts
-make trial TRIAL=bottle-demo  # Run a reproducible recipe-backed detector trial
+make workflow-session  # Recreate a 2x2 tmux split grid for logs and run outputs
+make trial TRIAL=bottle-demo  # Run a repeatable recipe-backed detector trial
 make detector       # Start object detection and stream logs
 make detector-bg    # Start object detection without following logs
 make detector-logs  # Follow detector logs
 make detector-stop  # Stop object detection
 make checkpoint     # Revalidate/download the YOLOX-X checkpoint
-make restart        # Pull and recreate the runtime preview
-make restart-local  # Build the runtime image locally and recreate the preview
-make down           # Stop and remove the preview container
+make restart        # Pull and recreate the runtime container
+make restart-local  # Build the runtime image locally and recreate the container
+make down           # Stop and remove the runtime container
 make clean-volumes  # Remove cached build/install/log volumes
 ```
 
 ## Recommended Run Order
 
-For the most transparent researcher run, use one tmux session:
+For the most transparent run, use one tmux session:
 
 ```bash
-make researcher-session
+make workflow-session
 ```
 
 It opens one tmux `run` window split into a 2x2 grid:
@@ -126,7 +126,7 @@ It opens one tmux `run` window split into a 2x2 grid:
 - top-left: simulation launch logs
 - bottom-left: recipe-backed detector logs
 - top-right: container logs
-- bottom-right: live run artifacts
+- bottom-right: live run outputs
 
 Mouse scrolling is enabled, and pane names are shown in the pane borders. A
 separate `shell` window gives an interactive ROS-ready shell, and a `help`
@@ -137,12 +137,12 @@ If a pane command exits or fails, that pane stays open at a shell prompt. Type
 `rerun` in the pane to execute the same command again, or press Up then Enter to
 edit and rerun the last command.
 
-`make researcher-session` replaces any existing `openhri` tmux session, so stale
-split-pane layouts are not reused. Use `make researcher-attach` only when you
+`make workflow-session` replaces any existing `openhri` tmux session, so stale
+split-pane layouts are not reused. Use `make workflow-attach` only when you
 want to return to the existing session without recreating it.
 
 Stop everything from inside tmux with `Ctrl-b` then `X`, or press `F12`. From a
-normal terminal, use `make researcher-stop`.
+normal terminal, use `make workflow-stop`.
 
 For a manual run, use three views:
 
@@ -156,19 +156,19 @@ Then open the object UI at:
 http://localhost:8080/
 ```
 
-## Notes For Researchers
+## Notes
 
 - The container uses software rendering for broad laptop compatibility.
 - The first `make start` pulls the published runtime image, then bootstraps the mounted ROS workspace.
 - Source changes under `dev_ws/` usually need `make bootstrap`, not a new image.
-- Runtime image changes under `Containerfile` or `container/` need `make start-local` during development and a new published image for evaluators.
+- Runtime image changes under `Containerfile` or `container/` need `make start-local` during development and a new published image for shared use.
 - Compose changes only change the local runtime wrapper; use `make restart` to recreate the container with the updated wrapper.
-- Run `make test` before sharing a changed branch; tests execute inside the preview container after rebuilding the mounted workspace.
-- `make researcher-session` requires tmux on the host and gives researchers full-screen, scrollable views of runtime logs and generated artifacts.
+- Run `make test` before sharing a changed branch; tests execute inside the runtime container after rebuilding the mounted workspace.
+- `make workflow-session` requires tmux on the host and gives operators full-screen, scrollable views of runtime logs and generated outputs.
 - Object detection is CPU-only by default; frame rate depends on host performance.
 - The simulation launch sets Gazebo model paths so `model://...` assets resolve inside the installed workspace.
-- The browser preview is the best path for evaluation, demos, and study-design feedback.
-- Recipe-backed trials write artifacts under `runs/<trial_id>/`.
+- The browser workflow is the best path for evaluation, demos, and review feedback.
+- Recipe-backed trials write outputs under `runs/<trial_id>/`.
 - Use `make trial-plan TRIAL=bottle-demo` to validate and materialize a run directory without starting the detector.
 - Use `make trial-pack TRIAL=bottle-demo` to create a shareable reproducibility zip.
 

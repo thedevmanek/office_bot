@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=OpenHRI Object UI
-Comment=Start the object detector node and local research UI
+Comment=Start object detection and the OpenHRI object console
 Exec=xfce4-terminal --hold --title "OpenHRI Object UI" --command "/usr/local/bin/start-object-detector.sh"
 Terminal=false
 Categories=Robotics;

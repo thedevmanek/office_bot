@@ -27,15 +27,15 @@ data_files.extend(package_files('models'))
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=find_packages(exclude=['test']),
     data_files=data_files,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='thedevmanek',
     maintainer_email='thedevmanek@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='OpenHRI office robot simulation model, world, launch, and Nav2 configuration',
+    license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [],
